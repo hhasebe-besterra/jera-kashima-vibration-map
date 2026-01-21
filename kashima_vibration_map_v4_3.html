@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JERA鹿島火力発電所 5・6号機 振動ピーク値分布マップ</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+        .sidebar {
+            width: 420px;
+            background: linear-gradient(180deg, #16213e 0%, #1a1a2e 100%);
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid #0f3460;
+        }
+        h1 {
+            font-size: 18px;
+            color: #e94560;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #e94560;
+            padding-bottom: 8px;
+        }
+        h2 {
+            font-size: 14px;
+            color: #94d2bd;
+            margin: 16px 0 10px;
+        }
+        .subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 16px;
+        }
+        
+        /* コントロールパネル */
+        .control-panel {
+            background: rgba(233, 69, 96, 0.1);
+            border: 1px solid #e94560;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .control-panel h3 {
+            color: #e94560;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .coord-display {
+            background: #0f3460;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 12px;
+            color: #94d2bd;
+        }
+        
+        /* 回転コントロール */
+        .rotation-control {
+            background: rgba(148, 210, 189, 0.1);
+            border: 1px solid #94d2bd;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .rotation-control h3 {
+            color: #94d2bd;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .slider-group {
+            margin: 10px 0;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+        .slider-value {
+            background: #0f3460;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #94d2bd;
+            min-width: 80px;
+            text-align: center;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #0f3460;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #94d2bd;
+            cursor: pointer;
+            border: 2px solid #fff;
+        }
+        
+        /* モード切替 */
+        .mode-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .mode-btn {
+            flex: 1;
+            background: #0f3460;
+            border: 2px solid #4a90e2;
+            color: #fff;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .mode-btn:hover {
+            background: #1a4a7a;
+        }
+        .mode-btn.active {
+            background: #4a90e2;
+            border-color: #fff;
+        }
+        .mode-btn.active.drag-mode {
+            background: #e94560;
+            border-color: #fff;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin: 12px 0;
+        }
+        .control-btn {
+            background: #0f3460;
+            border: 1px solid #4a90e2;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .control-btn:hover {
+            background: #4a90e2;
+        }
+        .control-btn.active {
+            background: #e94560;
+            border-color: #e94560;
+        }
+        
+        .reset-btn {
+            background: #e94560;
+            border: none;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .reset-btn:hover {
+            background: #ff6b6b;
+        }
+        
+        /* 共有機能 */
+        .share-control {
+            background: rgba(155, 89, 182, 0.1);
+            border: 1px solid #9b59b6;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .share-control h3 {
+            color: #9b59b6;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .share-btn {
+            background: #9b59b6;
+            border: none;
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .share-btn:hover {
+            background: #8e44ad;
+        }
+        .share-status {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #94d2bd;
+            text-align: center;
+            min-height: 20px;
+        }
+        
+        /* 換算表（常時表示） */
+        .conversion-table {
+            background: rgba(255, 165, 2, 0.15);
+            border: 2px solid #ffa502;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+        .conversion-table h3 {
+            color: #ffa502;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .conversion-table h3 a {
+            font-size: 11px;
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .conversion-table h3 a:hover {
+            text-decoration: underline;
+        }
+        .conversion-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .conversion-table th, .conversion-table td {
+            padding: 6px 8px;
+            text-align: center;
+            border-bottom: 1px solid #ffa50255;
+        }
+        .conversion-table th {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+        }
+        .conversion-table .formula {
+            margin-top: 10px;
+            padding: 8px;
+            background: #0f3460;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 13px;
+            text-align: center;
+            color: #94d2bd;
+        }
+        
+        /* 凡例 */
+        .legend {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+            font-size: 13px;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 10px;
+            border: 2px solid;
+        }
+        .center-legend { background: #e94560; border-color: #fff; }
+        .backward { background: rgba(255, 107, 107, 0.5); border-color: #ff6b6b; }
+        .lateral { background: rgba(74, 144, 226, 0.5); border-color: #4a90e2; }
+        
+        /* テーブル */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px 6px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+            font-weight: 500;
+        }
+        th {
+            background: #0f3460;
+            color: #94d2bd;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        td {
+            font-weight: 600;
+        }
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .backward-row td:first-child { color: #ff6b6b; font-weight: 700; }
+        .lateral-row td:first-child { color: #4a90e2; font-weight: 700; }
+        
+        .info-box {
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            font-size: 12px;
+            line-height: 1.8;
+        }
+        .info-box strong {
+            color: #4a90e2;
+        }
+        
+        /* ポップアップ */
+        .leaflet-popup-content-wrapper {
+            background: #16213e;
+            color: #fff;
+            border-radius: 8px;
+        }
+        .leaflet-popup-tip {
+            background: #16213e;
+        }
+        .popup-content {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .popup-content strong {
+            color: #e94560;
+        }
+        .popup-content .value {
+            color: #94d2bd;
+            font-weight: bold;
+        }
+        
+        /* ドラッグヒント */
+        .drag-hint {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(233, 69, 96, 0.95);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            pointer-events: none;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        /* マーカースタイル */
+        .center-marker {
+            background: #e94560;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(233,69,96,0.8);
+            cursor: move;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="map">
+            <div class="drag-hint" id="dragHint">🎯 マーカーをドラッグして位置を調整 / スライダーで全体回転</div>
+        </div>
+        <div class="sidebar">
+            <h1>🏭 JERA鹿島火力発電所</h1>
+            <div class="subtitle">5・6号機煙突転倒時 振動ピーク値分布</div>
+            
+            <!-- モード切替 -->
+            <div class="mode-toggle">
+                <button class="mode-btn active drag-mode" id="dragModeBtn" onclick="setMode('drag')">
+                    ✋ ドラッグモード<br><small>マーカー移動</small>
+                </button>
+                <button class="mode-btn" id="viewModeBtn" onclick="setMode('view')">
+                    👁️ 閲覧モード<br><small>地図操作のみ</small>
+                </button>
+            </div>
+            
+            <!-- 位置コントロール -->
+            <div class="control-panel">
+                <h3>📍 煙突位置（中心）</h3>
+                <div class="coord-display" id="coordDisplay">
+                    緯度: 35.917924 / 経度: 140.698911
+                </div>
+            </div>
+            
+            <!-- 回転コントロール -->
+            <div class="rotation-control">
+                <h3>🔄 全体回転</h3>
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>回転角度</span>
+                        <span class="slider-value" id="rotationValue">153°</span>
+                    </div>
+                    <input type="range" id="rotationSlider" min="0" max="359" value="153">
+                </div>
+                <div style="font-size:11px;color:#888;margin-top:6px;">
+                    煙突を中心に全計測点を回転します
+                </div>
+                <button class="reset-btn" onclick="resetAll()">🔄 位置をリセット</button>
+            </div>
+            
+            <!-- 表示切替 -->
+            <div class="controls">
+                <button class="control-btn active" onclick="toggleLayer('backward')">後方</button>
+                <button class="control-btn active" onclick="toggleLayer('lateral')">横方向</button>
+                <button class="control-btn active" onclick="toggleLayer('circles')">同心円</button>
+                <button class="control-btn" onclick="toggleLayer('lines')">接続線</button>
+            </div>
+            
+            <!-- 凡例 -->
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color center-legend"></div>
+                    <span>煙突位置（中心・ドラッグ可）</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color backward"></div>
+                    <span>後方 計測点（ドラッグ可）</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color lateral"></div>
+                    <span>横方向 計測点（ドラッグ可）</span>
+                </div>
+            </div>
+            
+            <h2>📊 計測データ一覧</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>計測点</th>
+                        <th>距離</th>
+                        <th>加速度<br>[m/s²]</th>
+                        <th>dB</th>
+                        <th>速度<br>[cm/s]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="backward-row"><td>①後方</td><td>20m</td><td>1.14</td><td>121.2</td><td>1.03</td></tr>
+                    <tr class="backward-row"><td>②後方</td><td>50m</td><td>0.85</td><td>118.6</td><td>0.61</td></tr>
+                    <tr class="backward-row"><td>③後方</td><td>100m</td><td>0.42</td><td>112.4</td><td>0.28</td></tr>
+                    <tr class="backward-row"><td>④後方</td><td>200m</td><td>0.21</td><td>106.3</td><td>0.16</td></tr>
+                    <tr class="backward-row"><td>⑤後方</td><td>300m</td><td>0.10</td><td>100.1</td><td>0.08</td></tr>
+                    <tr class="backward-row"><td>⑥後方</td><td>400m</td><td>0.07</td><td>96.4</td><td>0.05</td></tr>
+                    <tr class="lateral-row"><td>⑦横</td><td>50m</td><td>2.78</td><td>128.9</td><td>2.27</td></tr>
+                    <tr class="lateral-row"><td>⑧横</td><td>100m</td><td>1.97</td><td>125.9</td><td>1.23</td></tr>
+                    <tr class="lateral-row"><td>⑨横</td><td>200m</td><td>0.46</td><td>113.3</td><td>0.44</td></tr>
+                    <tr class="lateral-row"><td>⑩横</td><td>300m</td><td>0.42</td><td>112.4</td><td>0.30</td></tr>
+                    <tr class="lateral-row"><td>⑪横</td><td>400m</td><td>0.22</td><td>106.8</td><td>0.16</td></tr>
+                </tbody>
+            </table>
+            
+            <div class="info-box">
+                <strong>💡 操作方法</strong><br>
+                ・<b>ドラッグモード:</b> 全マーカーを自由に移動<br>
+                ・<b>閲覧モード:</b> 地図のみ操作（マーカー固定）<br>
+                ・<b>回転スライダー:</b> 全体を中心から回転<br>
+                ・<b>同心円/接続線:</b> 距離参照用の表示
+            </div>
+            
+            <!-- 換算表 -->
+            <div class="conversion-table">
+                <h3>
+                    📐 加速度・dB・震度 換算表
+                    <a href="conversion_explanation.html" target="_blank">📖 換算の根拠</a>
+                </h3>
+                <table>
+                    <tr><th>加速度 [m/s²]</th><th>dB</th><th>震度（目安）</th></tr>
+                    <tr><td>0.001</td><td>60</td><td>0</td></tr>
+                    <tr><td>0.01</td><td>80</td><td>1</td></tr>
+                    <tr><td>0.1</td><td>100</td><td>2〜3</td></tr>
+                    <tr><td>1</td><td>120</td><td>3〜4</td></tr>
+                    <tr><td>10</td><td>140</td><td>5強〜6弱</td></tr>
+                </table>
+                <div class="formula">1 m/s² = 120 dB</div>
+            </div>
+            
+            <!-- 共有機能（一番下） -->
+            <div class="share-control">
+                <h3>🔗 共有</h3>
+                <button class="share-btn" onclick="copyShareUrl()">📋 共有URLをコピー</button>
+                <div class="share-status" id="shareStatus"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== 初期設定 ==========
+        const initialCenter = { lat: 35.917924, lng: 140.698911 };
+        let currentRotation = 153; // デフォルト153°
+        let isDragMode = true;
+        
+        // マーカーサイズ（固定）
+        const MARKER_SIZE = 32;
+        
+        // 計測データ
+        const backwardData = [
+            { id: "①", dist: 20, bearing: 0, acc: 1.14, db: 121.2, vel: 1.03 },
+            { id: "②", dist: 50, bearing: 0, acc: 0.85, db: 118.6, vel: 0.61 },
+            { id: "③", dist: 100, bearing: 0, acc: 0.42, db: 112.4, vel: 0.28 },
+            { id: "④", dist: 200, bearing: 0, acc: 0.21, db: 106.3, vel: 0.16 },
+            { id: "⑤", dist: 300, bearing: 0, acc: 0.10, db: 100.1, vel: 0.08 },
+            { id: "⑥", dist: 400, bearing: 0, acc: 0.07, db: 96.4, vel: 0.05 }
+        ];
+        const lateralData = [
+            { id: "⑦", dist: 50, bearing: 90, acc: 2.78, db: 128.9, vel: 2.27 },
+            { id: "⑧", dist: 100, bearing: 90, acc: 1.97, db: 125.9, vel: 1.23 },
+            { id: "⑨", dist: 200, bearing: 90, acc: 0.46, db: 113.3, vel: 0.44 },
+            { id: "⑩", dist: 300, bearing: 90, acc: 0.42, db: 112.4, vel: 0.30 },
+            { id: "⑪", dist: 400, bearing: 90, acc: 0.22, db: 106.8, vel: 0.16 }
+        ];
+        
+        // 現在の位置を保持
+        let centerPos = L.latLng(initialCenter.lat, initialCenter.lng);
+        let backwardMarkers = [];
+        let lateralMarkers = [];
+        let backwardPositions = [];
+        let lateralPositions = [];
+        
+        // ========== マップ初期化 ==========
+        const map = L.map('map', {
+            center: [initialCenter.lat, initialCenter.lng],
+            zoom: 15
+        });
+        
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri'
+        });
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        });
+        satelliteLayer.addTo(map);
+        L.control.layers({ "航空写真": satelliteLayer, "地図": osmLayer }).addTo(map);
+        L.control.scale({ imperial: false }).addTo(map);
+        
+        // ========== 座標計算（Leaflet.circle互換） ==========
+        function offsetLatLng(lat, lng, distanceM, bearingDeg) {
+            const R = 6378137;
+            const d = distanceM / R;
+            const bearingRad = bearingDeg * Math.PI / 180;
+            const latRad = lat * Math.PI / 180;
+            const lngRad = lng * Math.PI / 180;
+            const newLatRad = Math.asin(
+                Math.sin(latRad) * Math.cos(d) +
+                Math.cos(latRad) * Math.sin(d) * Math.cos(bearingRad)
+            );
+            const newLngRad = lngRad + Math.atan2(
+                Math.sin(bearingRad) * Math.sin(d) * Math.cos(latRad),
+                Math.cos(d) - Math.sin(latRad) * Math.sin(newLatRad)
+            );
+            return L.latLng(newLatRad * 180 / Math.PI, newLngRad * 180 / Math.PI);
+        }
+        
+        function rotatePoint(center, point, angleDeg) {
+            const dist = center.distanceTo(point);
+            
+            // 現在の方位角を計算
+            const dLat = point.lat - center.lat;
+            const dLng = point.lng - center.lng;
+            const currentBearing = Math.atan2(dLng * Math.cos(center.lat * Math.PI / 180), dLat) * 180 / Math.PI;
+            
+            // 新しい方位角
+            const newBearing = (currentBearing + angleDeg + 360) % 360;
+            
+            return offsetLatLng(center.lat, center.lng, dist, newBearing);
+        }
+        
+        // ========== レイヤーグループ ==========
+        const backwardLayer = L.layerGroup().addTo(map);
+        const lateralLayer = L.layerGroup().addTo(map);
+        const circlesLayer = L.layerGroup().addTo(map); // デフォルトで表示
+        const linesLayer = L.layerGroup();
+        
+        // ========== 中心マーカー ==========
+        const centerIcon = L.divIcon({
+            className: 'center-marker',
+            html: '<div class="center-marker"></div>',
+            iconSize: [28, 28],
+            iconAnchor: [14, 14]
+        });
+        
+        const centerMarker = L.marker([centerPos.lat, centerPos.lng], {
+            icon: centerIcon,
+            draggable: true,
+            zIndexOffset: 1000
+        }).addTo(map);
+        
+        centerMarker.bindPopup('<div class="popup-content"><strong>🏭 煙突位置</strong><br>ドラッグで移動</div>');
+        
+        centerMarker.on('drag', function(e) {
+            if (!isDragMode) return;
+            const oldCenter = centerPos;
+            const newCenter = e.target.getLatLng();
+            
+            const dLat = newCenter.lat - oldCenter.lat;
+            const dLng = newCenter.lng - oldCenter.lng;
+            
+            backwardMarkers.forEach((m, i) => {
+                const pos = m.getLatLng();
+                const newPos = L.latLng(pos.lat + dLat, pos.lng + dLng);
+                m.setLatLng(newPos);
+                backwardPositions[i] = newPos;
+            });
+            
+            lateralMarkers.forEach((m, i) => {
+                const pos = m.getLatLng();
+                const newPos = L.latLng(pos.lat + dLat, pos.lng + dLng);
+                m.setLatLng(newPos);
+                lateralPositions[i] = newPos;
+            });
+            
+            centerPos = newCenter;
+            updateCoordDisplay();
+            updateLines();
+            updateCircles();
+        });
+        
+        // ========== 計測点マーカー作成（CircleMarker使用で正確な位置） ==========
+        function createMeasurementMarker(data, type, index) {
+            const bearing = data.bearing + currentRotation;
+            const pos = offsetLatLng(centerPos.lat, centerPos.lng, data.dist, bearing);
+            
+            const color = type === 'backward' ? '#ff6b6b' : '#4a90e2';
+            const typeName = type === 'backward' ? '後方' : '横方向';
+            
+            // CircleMarkerを使用（位置が正確）
+            const marker = L.circleMarker(pos, {
+                radius: 16,
+                fillColor: color,
+                color: '#fff',
+                weight: 3,
+                fillOpacity: 0.9,
+                draggable: false // CircleMarkerはdraggable非対応なのでカスタム実装
+            });
+            
+            marker.bindPopup(`
+                <div class="popup-content">
+                    <strong style="font-size:16px;">${data.id} ${typeName} ${data.dist}m</strong><br><br>
+                    加速度: <span class="value">${data.acc} m/s²</span><br>
+                    振動: <span class="value">${data.db} dB</span><br>
+                    速度: <span class="value">${data.vel} cm/s</span><br><br>
+                    <small style="color:#888;">ドラッグで移動可能</small>
+                </div>
+            `);
+            
+            // ラベル用のマーカー（DivIcon）
+            const labelIcon = L.divIcon({
+                className: 'marker-label',
+                html: `<div style="
+                    color: #fff;
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.8), -1px -1px 2px rgba(0,0,0,0.8);
+                    pointer-events: none;
+                ">${data.id}</div>`,
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            });
+            
+            const labelMarker = L.marker(pos, {
+                icon: labelIcon,
+                interactive: false,
+                zIndexOffset: 600
+            });
+            
+            // ドラッグ用の透明マーカー
+            const dragIcon = L.divIcon({
+                className: 'drag-handle',
+                html: `<div style="
+                    width: 36px;
+                    height: 36px;
+                    cursor: move;
+                "></div>`,
+                iconSize: [36, 36],
+                iconAnchor: [18, 18]
+            });
+            
+            const dragMarker = L.marker(pos, {
+                icon: dragIcon,
+                draggable: true,
+                zIndexOffset: 700
+            });
+            
+            dragMarker.on('drag', function(e) {
+                if (!isDragMode) return;
+                const newPos = e.target.getLatLng();
+                marker.setLatLng(newPos);
+                labelMarker.setLatLng(newPos);
+                if (type === 'backward') {
+                    backwardPositions[index] = newPos;
+                } else {
+                    lateralPositions[index] = newPos;
+                }
+                updateLines();
+            });
+            
+            return { marker, labelMarker, dragMarker, pos };
+        }
+        
+        let backwardLabels = [];
+        let lateralLabels = [];
+        let backwardDragHandles = [];
+        let lateralDragHandles = [];
+        
+        function initializeMarkers() {
+            backwardLayer.clearLayers();
+            lateralLayer.clearLayers();
+            backwardMarkers = [];
+            lateralMarkers = [];
+            backwardPositions = [];
+            lateralPositions = [];
+            backwardLabels = [];
+            lateralLabels = [];
+            backwardDragHandles = [];
+            lateralDragHandles = [];
+            
+            // 後方マーカー
+            backwardData.forEach((d, i) => {
+                const { marker, labelMarker, dragMarker, pos } = createMeasurementMarker(d, 'backward', i);
+                backwardLayer.addLayer(marker);
+                backwardLayer.addLayer(labelMarker);
+                backwardLayer.addLayer(dragMarker);
+                backwardMarkers.push(marker);
+                backwardLabels.push(labelMarker);
+                backwardDragHandles.push(dragMarker);
+                backwardPositions.push(pos);
+            });
+            
+            // 横方向マーカー
+            lateralData.forEach((d, i) => {
+                const { marker, labelMarker, dragMarker, pos } = createMeasurementMarker(d, 'lateral', i);
+                lateralLayer.addLayer(marker);
+                lateralLayer.addLayer(labelMarker);
+                lateralLayer.addLayer(dragMarker);
+                lateralMarkers.push(marker);
+                lateralLabels.push(labelMarker);
+                lateralDragHandles.push(dragMarker);
+                lateralPositions.push(pos);
+            });
+            
+            updateLines();
+            updateCircles();
+        }
+        
+        // ========== 接続線更新 ==========
+        function updateLines() {
+            linesLayer.clearLayers();
+            
+            const backwardLineCoords = [centerPos, ...backwardPositions];
+            const backwardLine = L.polyline(backwardLineCoords, {
+                color: '#ff6b6b',
+                weight: 6,
+                opacity: 0.9,
+                dashArray: '12, 8'
+            });
+            linesLayer.addLayer(backwardLine);
+            
+            const lateralLineCoords = [centerPos, ...lateralPositions];
+            const lateralLine = L.polyline(lateralLineCoords, {
+                color: '#4a90e2',
+                weight: 6,
+                opacity: 0.9,
+                dashArray: '12, 8'
+            });
+            linesLayer.addLayer(lateralLine);
+        }
+        
+        // ========== 同心円更新（offsetLatLngと同じ計算方法で描画） ==========
+        function updateCircles() {
+            circlesLayer.clearLayers();
+            const distances = [20, 50, 100, 200, 300, 400];
+            const colors = ['#e94560', '#ff6b6b', '#ffa502', '#94d2bd', '#4a90e2', '#9b59b6'];
+            
+            distances.forEach((dist, i) => {
+                // offsetLatLngを使って円を描画（マーカーと同じ計算方法）
+                const circlePoints = [];
+                for (let angle = 0; angle <= 360; angle += 3) {
+                    const point = offsetLatLng(centerPos.lat, centerPos.lng, dist, angle);
+                    circlePoints.push(point);
+                }
+                
+                const circle = L.polyline(circlePoints, {
+                    color: colors[i],
+                    weight: 5,
+                    opacity: 0.9,
+                    dashArray: '10, 6',
+                    fill: true,
+                    fillColor: colors[i],
+                    fillOpacity: 0.05
+                });
+                circlesLayer.addLayer(circle);
+                
+                const labelPos = offsetLatLng(centerPos.lat, centerPos.lng, dist, 45 + currentRotation);
+                const label = L.marker(labelPos, {
+                    icon: L.divIcon({
+                        html: `<div style="background:${colors[i]};padding:4px 10px;border-radius:4px;font-size:13px;font-weight:bold;color:#fff;text-shadow:1px 1px 2px rgba(0,0,0,0.5);">${dist}m</div>`,
+                        iconSize: [50, 24],
+                        iconAnchor: [25, 12]
+                    }),
+                    interactive: false
+                });
+                circlesLayer.addLayer(label);
+            });
+        }
+        
+        // ========== 座標表示更新 ==========
+        function updateCoordDisplay() {
+            document.getElementById('coordDisplay').textContent = 
+                `緯度: ${centerPos.lat.toFixed(6)} / 経度: ${centerPos.lng.toFixed(6)}`;
+        }
+        
+        // ========== 回転処理 ==========
+        function applyRotation(newRotation) {
+            const rotationDelta = newRotation - currentRotation;
+            
+            backwardMarkers.forEach((m, i) => {
+                const newPos = rotatePoint(centerPos, backwardPositions[i], rotationDelta);
+                m.setLatLng(newPos);
+                backwardLabels[i].setLatLng(newPos);
+                backwardDragHandles[i].setLatLng(newPos);
+                backwardPositions[i] = newPos;
+            });
+            
+            lateralMarkers.forEach((m, i) => {
+                const newPos = rotatePoint(centerPos, lateralPositions[i], rotationDelta);
+                m.setLatLng(newPos);
+                lateralLabels[i].setLatLng(newPos);
+                lateralDragHandles[i].setLatLng(newPos);
+                lateralPositions[i] = newPos;
+            });
+            
+            currentRotation = newRotation;
+            updateLines();
+            updateCircles();
+        }
+        
+        // ========== モード切替 ==========
+        function setMode(mode) {
+            isDragMode = (mode === 'drag');
+            
+            document.getElementById('dragModeBtn').classList.toggle('active', isDragMode);
+            document.getElementById('viewModeBtn').classList.toggle('active', !isDragMode);
+            
+            centerMarker.dragging[isDragMode ? 'enable' : 'disable']();
+            backwardDragHandles.forEach(m => m.dragging[isDragMode ? 'enable' : 'disable']());
+            lateralDragHandles.forEach(m => m.dragging[isDragMode ? 'enable' : 'disable']());
+        }
+        
+        // ========== リセット ==========
+        function resetAll() {
+            centerPos = L.latLng(initialCenter.lat, initialCenter.lng);
+            centerMarker.setLatLng(centerPos);
+            currentRotation = 153; // デフォルト153°
+            document.getElementById('rotationSlider').value = 153;
+            document.getElementById('rotationValue').textContent = '153°';
+            updateCoordDisplay();
+            initializeMarkers();
+        }
+        
+        // ========== レイヤー切替 ==========
+        const layerState = { backward: true, lateral: true, circles: true, lines: false };
+        
+        function toggleLayer(name) {
+            layerState[name] = !layerState[name];
+            const btn = document.querySelector(`[onclick="toggleLayer('${name}')"]`);
+            
+            if (layerState[name]) {
+                btn.classList.add('active');
+                if (name === 'backward') backwardLayer.addTo(map);
+                if (name === 'lateral') lateralLayer.addTo(map);
+                if (name === 'circles') circlesLayer.addTo(map);
+                if (name === 'lines') linesLayer.addTo(map);
+            } else {
+                btn.classList.remove('active');
+                if (name === 'backward') map.removeLayer(backwardLayer);
+                if (name === 'lateral') map.removeLayer(lateralLayer);
+                if (name === 'circles') map.removeLayer(circlesLayer);
+                if (name === 'lines') map.removeLayer(linesLayer);
+            }
+        }
+        
+        // ========== イベントリスナー ==========
+        document.getElementById('rotationSlider').addEventListener('input', function(e) {
+            const rotation = parseInt(e.target.value);
+            document.getElementById('rotationValue').textContent = `${rotation}°`;
+            applyRotation(rotation);
+        });
+        
+        // ヒント非表示
+        setTimeout(() => {
+            document.getElementById('dragHint').style.display = 'none';
+        }, 5000);
+        
+        // ========== 初期化 ==========
+        loadFromUrl();
+        initializeMarkers();
+        updateCoordDisplay();
+        
+        // 初期ボタン状態を反映
+        document.querySelector(`[onclick="toggleLayer('circles')"]`).classList.add('active');
+        
+        // ========== 共有機能 ==========
+        function generateShareData() {
+            const data = {
+                c: [centerPos.lat.toFixed(6), centerPos.lng.toFixed(6)],
+                r: currentRotation,
+                b: backwardPositions.map(p => [p.lat.toFixed(6), p.lng.toFixed(6)]),
+                l: lateralPositions.map(p => [p.lat.toFixed(6), p.lng.toFixed(6)]),
+                z: map.getZoom()
+            };
+            return btoa(JSON.stringify(data));
+        }
+        
+        function copyShareUrl() {
+            const shareData = generateShareData();
+            const url = window.location.origin + window.location.pathname + '?d=' + shareData;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                document.getElementById('shareStatus').textContent = '✅ URLをコピーしました！';
+                setTimeout(() => {
+                    document.getElementById('shareStatus').textContent = '';
+                }, 3000);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = url;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                document.getElementById('shareStatus').textContent = '✅ URLをコピーしました！';
+                setTimeout(() => {
+                    document.getElementById('shareStatus').textContent = '';
+                }, 3000);
+            });
+        }
+        
+        function loadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const dataParam = params.get('d');
+            
+            if (!dataParam) return false;
+            
+            try {
+                const data = JSON.parse(atob(dataParam));
+                
+                if (data.c) {
+                    centerPos = L.latLng(parseFloat(data.c[0]), parseFloat(data.c[1]));
+                    centerMarker.setLatLng(centerPos);
+                }
+                
+                if (data.r !== undefined) {
+                    currentRotation = data.r;
+                    document.getElementById('rotationSlider').value = currentRotation;
+                    document.getElementById('rotationValue').textContent = `${currentRotation}°`;
+                }
+                
+                if (data.z) {
+                    map.setView(centerPos, data.z);
+                }
+                
+                if (data.b) {
+                    setTimeout(() => {
+                        data.b.forEach((pos, i) => {
+                            if (backwardMarkers[i]) {
+                                const newPos = L.latLng(parseFloat(pos[0]), parseFloat(pos[1]));
+                                backwardMarkers[i].setLatLng(newPos);
+                                backwardLabels[i].setLatLng(newPos);
+                                backwardDragHandles[i].setLatLng(newPos);
+                                backwardPositions[i] = newPos;
+                            }
+                        });
+                        updateLines();
+                    }, 100);
+                }
+                
+                if (data.l) {
+                    setTimeout(() => {
+                        data.l.forEach((pos, i) => {
+                            if (lateralMarkers[i]) {
+                                const newPos = L.latLng(parseFloat(pos[0]), parseFloat(pos[1]));
+                                lateralMarkers[i].setLatLng(newPos);
+                                lateralLabels[i].setLatLng(newPos);
+                                lateralDragHandles[i].setLatLng(newPos);
+                                lateralPositions[i] = newPos;
+                            }
+                        });
+                        updateLines();
+                    }, 100);
+                }
+                
+                document.getElementById('shareStatus').textContent = '📥 共有データを読み込みました';
+                setTimeout(() => {
+                    document.getElementById('shareStatus').textContent = '';
+                }, 3000);
+                
+                return true;
+            } catch (e) {
+                console.error('共有データの読み込みに失敗:', e);
+                return false;
+            }
+        }
+    </script>
+</body>
+</html>

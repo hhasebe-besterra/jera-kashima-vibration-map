@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>加速度・dB・震度 換算の根拠</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 28px;
+            color: #ffa502;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #ffa502;
+            padding-bottom: 15px;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #4a90e2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .section h2 {
+            color: #94d2bd;
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section p {
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .formula-box {
+            background: #0f3460;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .formula {
+            font-family: 'Times New Roman', serif;
+            font-size: 24px;
+            color: #ffa502;
+            margin-bottom: 10px;
+        }
+        .formula-note {
+            font-size: 14px;
+            color: #94d2bd;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: rgba(255, 165, 2, 0.2);
+            color: #ffa502;
+            font-weight: 600;
+        }
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .highlight {
+            background: rgba(255, 165, 2, 0.2);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffa502;
+            margin: 20px 0;
+        }
+        .highlight strong {
+            color: #ffa502;
+        }
+        
+        .reference {
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid #4a90e2;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+        .reference h3 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+        }
+        .reference ul {
+            list-style: none;
+            padding: 0;
+        }
+        .reference li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+        }
+        .reference li:last-child {
+            border-bottom: none;
+        }
+        .reference a {
+            color: #4a90e2;
+            text-decoration: none;
+        }
+        .reference a:hover {
+            text-decoration: underline;
+        }
+        
+        .example-calc {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        .example-calc .step {
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 4px;
+        }
+        .example-calc .result {
+            color: #94d2bd;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .comparison-table {
+            margin: 20px 0;
+        }
+        .comparison-table th {
+            background: rgba(148, 210, 189, 0.2);
+            color: #94d2bd;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+            font-size: 12px;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="kashima_vibration_map_v4.html" class="back-link">← マップに戻る</a>
+        
+        <h1>📐 加速度・dB・震度 換算の根拠</h1>
+        <p class="subtitle">JERA鹿島火力発電所 振動計測データの換算方法について</p>
+        
+        <!-- 基本的な換算式 -->
+        <div class="section">
+            <h2>📝 1. 基本換算式</h2>
+            <p>
+                振動加速度レベル（VAL: Vibration Acceleration Level）は、加速度の実効値を
+                デシベル（dB）で表したものです。日本では JIS C 1510 に基づき、以下の式で定義されます。
+            </p>
+            
+            <div class="formula-box">
+                <div class="formula">VAL = 20 × log₁₀(a / a₀) [dB]</div>
+                <div class="formula-note">
+                    a: 測定加速度 [m/s²]<br>
+                    a₀: 基準加速度 = 10⁻⁵ m/s² (= 0.00001 m/s²)
+                </div>
+            </div>
+            
+            <div class="highlight">
+                <strong>基準値 10⁻⁵ m/s² について：</strong><br>
+                この基準値は、人間が振動を感知できる最小レベル（感覚閾値）に近い値として
+                国際的に採用されています。ISO 1683 でも同様の基準が使用されています。
+            </div>
+        </div>
+        
+        <!-- 1 m/s² = 120 dB の導出 -->
+        <div class="section">
+            <h2>🔢 2. 「1 m/s² = 120 dB」の導出</h2>
+            <p>
+                報告書に記載されている「1 m/s² = 120 dB」という換算は、上記の式から導出されます。
+            </p>
+            
+            <div class="example-calc">
+                <div class="step">
+                    <strong>計算例：a = 1 m/s² の場合</strong>
+                </div>
+                <div class="step">
+                    VAL = 20 × log₁₀(1 / 10⁻⁵)
+                </div>
+                <div class="step">
+                    VAL = 20 × log₁₀(10⁵)
+                </div>
+                <div class="step">
+                    VAL = 20 × 5
+                </div>
+                <div class="step result">
+                    VAL = 100 dB ... ではなく、120 dB？
+                </div>
+            </div>
+            
+            <div class="highlight">
+                <strong>⚠️ 注意：基準値の違い</strong><br>
+                本報告書では、基準加速度として <strong>a₀ = 10⁻⁶ m/s²</strong> を使用している可能性があります。
+                この場合：<br><br>
+                VAL = 20 × log₁₀(1 / 10⁻⁶) = 20 × 6 = <strong>120 dB</strong><br><br>
+                または、ピーク値と実効値の換算（√2倍）や、測定機器の設定による違いの可能性もあります。
+                実際の換算基準は使用した振動計の仕様をご確認ください。
+            </div>
+        </div>
+        
+        <!-- 換算表の詳細 -->
+        <div class="section">
+            <h2>📊 3. 換算表の詳細</h2>
+            <p>以下は、1 m/s² = 120 dB として計算した換算表です。</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>加速度 [m/s²]</th>
+                            <th>dB計算過程</th>
+                            <th>振動レベル [dB]</th>
+                            <th>震度（目安）</th>
+                            <th>人体への影響</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0.001</td>
+                            <td>120 + 20×log₁₀(0.001)</td>
+                            <td>60</td>
+                            <td>0</td>
+                            <td>人体では感じない</td>
+                        </tr>
+                        <tr>
+                            <td>0.01</td>
+                            <td>120 + 20×log₁₀(0.01)</td>
+                            <td>80</td>
+                            <td>1</td>
+                            <td>静かな環境で感じる</td>
+                        </tr>
+                        <tr>
+                            <td>0.1</td>
+                            <td>120 + 20×log₁₀(0.1)</td>
+                            <td>100</td>
+                            <td>2〜3</td>
+                            <td>ほとんどの人が感じる</td>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>120 + 20×log₁₀(1)</td>
+                            <td>120</td>
+                            <td>3〜4</td>
+                            <td>恐怖感、物が動く</td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td>120 + 20×log₁₀(10)</td>
+                            <td>140</td>
+                            <td>5強〜6弱</td>
+                            <td>立っていられない</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <p>
+                <strong>一般化した計算式：</strong><br>
+                dB = 120 + 20 × log₁₀(加速度[m/s²])
+            </p>
+        </div>
+        
+        <!-- 震度との対応 -->
+        <div class="section">
+            <h2>🌏 4. 気象庁震度階級との対応</h2>
+            <p>
+                気象庁震度階級は、計測震度から決定されます。計測震度は地震計で測定した
+                加速度・速度・変位から複雑な計算式で求められますが、おおよその目安として
+                以下の対応関係があります。
+            </p>
+            
+            <div class="table-container comparison-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>震度</th>
+                            <th>計測震度</th>
+                            <th>加速度の目安 [gal]</th>
+                            <th>加速度の目安 [m/s²]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>0.5未満</td><td>0.8未満</td><td>0.008未満</td></tr>
+                        <tr><td>1</td><td>0.5〜1.5</td><td>0.8〜2.5</td><td>0.008〜0.025</td></tr>
+                        <tr><td>2</td><td>1.5〜2.5</td><td>2.5〜8</td><td>0.025〜0.08</td></tr>
+                        <tr><td>3</td><td>2.5〜3.5</td><td>8〜25</td><td>0.08〜0.25</td></tr>
+                        <tr><td>4</td><td>3.5〜4.5</td><td>25〜80</td><td>0.25〜0.8</td></tr>
+                        <tr><td>5弱</td><td>4.5〜5.0</td><td>80〜140</td><td>0.8〜1.4</td></tr>
+                        <tr><td>5強</td><td>5.0〜5.5</td><td>140〜250</td><td>1.4〜2.5</td></tr>
+                        <tr><td>6弱</td><td>5.5〜6.0</td><td>250〜450</td><td>2.5〜4.5</td></tr>
+                        <tr><td>6強</td><td>6.0〜6.5</td><td>450〜800</td><td>4.5〜8.0</td></tr>
+                        <tr><td>7</td><td>6.5以上</td><td>800以上</td><td>8.0以上</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="highlight">
+                <strong>注意：</strong>震度は加速度だけでなく、周期特性なども考慮して決定されます。
+                上表はあくまで目安であり、実際の震度とは異なる場合があります。
+                特に工事振動のような人工振動は、地震とは周波数特性が異なるため、
+                同じ加速度でも体感が異なることがあります。
+            </div>
+        </div>
+        
+        <!-- 本計測データの解釈 -->
+        <div class="section">
+            <h2>📈 5. 鹿島火力発電所計測データの解釈</h2>
+            <p>本計測で得られた代表的なデータの解釈：</p>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>計測点</th>
+                            <th>距離</th>
+                            <th>加速度</th>
+                            <th>dB</th>
+                            <th>震度目安</th>
+                            <th>解釈</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>⑦横50m</td>
+                            <td>50m</td>
+                            <td>2.78 m/s²</td>
+                            <td>128.9</td>
+                            <td>5強〜6弱</td>
+                            <td>非常に強い振動、立っていられないレベル</td>
+                        </tr>
+                        <tr>
+                            <td>①後方20m</td>
+                            <td>20m</td>
+                            <td>1.14 m/s²</td>
+                            <td>121.2</td>
+                            <td>5弱程度</td>
+                            <td>強い振動、物が倒れる可能性</td>
+                        </tr>
+                        <tr>
+                            <td>③後方100m</td>
+                            <td>100m</td>
+                            <td>0.42 m/s²</td>
+                            <td>112.4</td>
+                            <td>4程度</td>
+                            <td>かなりの揺れ、吊り下げ物が動く</td>
+                        </tr>
+                        <tr>
+                            <td>⑥後方400m</td>
+                            <td>400m</td>
+                            <td>0.07 m/s²</td>
+                            <td>96.4</td>
+                            <td>2〜3</td>
+                            <td>多くの人が感じる軽い振動</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- 参考文献 -->
+        <div class="reference">
+            <h3>📚 参考文献・規格</h3>
+            <ul>
+                <li><strong>JIS C 1510:1995</strong> - 振動レベル計</li>
+                <li><strong>JIS C 1517:2014</strong> - 振動レベル計の電気的性能測定方法</li>
+                <li><strong>ISO 1683:2015</strong> - Acoustics — Preferred reference values for acoustical and vibratory levels</li>
+                <li><strong>気象庁</strong> - 震度の算出方法（計測震度の算出方法）</li>
+                <li><strong>環境省</strong> - 振動規制法に基づく振動の測定方法</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            JERA鹿島火力発電所 5・6号機煙突転倒 振動計測データ<br>
+            換算根拠説明ページ
+        </div>
+    </div>
+</body>
+</html>
