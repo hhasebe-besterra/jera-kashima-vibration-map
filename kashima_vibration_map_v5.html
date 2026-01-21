@@ -174,7 +174,8 @@
         /* 凡例 */
         .legend {
             display: flex;
-            gap: 15px;
+            flex-wrap: wrap;
+            gap: 10px 15px;
             margin-bottom: 15px;
             font-size: 12px;
         }
@@ -190,6 +191,7 @@
         }
         .legend-color.backward { background: #e94560; }
         .legend-color.lateral { background: #4a90e2; }
+        .legend-color.chimney { background: #ff9500; }
         
         /* データテーブル */
         h2 {
@@ -328,6 +330,20 @@
             box-shadow: 0 0 20px rgba(233,69,96,0.8);
             cursor: move;
         }
+        
+        /* 煙突転倒ラベル */
+        .chimney-label {
+            background: rgba(255, 149, 0, 0.9);
+            border: 2px solid #cc7000;
+            border-radius: 6px;
+            padding: 4px 8px;
+            color: #000;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
     </style>
 </head>
 <body>
@@ -391,11 +407,15 @@
             <div class="legend">
                 <div class="legend-item">
                     <div class="legend-color backward"></div>
-                    <span>後方（転倒方向）</span>
+                    <span>後方（振動計測方向）</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color lateral"></div>
                     <span>横方向</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color chimney"></div>
+                    <span>煙突転倒方向</span>
                 </div>
             </div>
             
@@ -663,6 +683,61 @@
                 lateralPoints.push(offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90));
             });
             L.polyline(lateralPoints, { color: '#4a90e2', weight: 5, opacity: 0.8 }).addTo(linesLayer);
+            
+            // ========== 煙突転倒イメージ ==========
+            // 転倒方向（後方の反対 = 前方）
+            const fallDirection = currentRotation + 180;
+            const chimneyLength = 230; // 煙突の長さ（メートル）
+            const chimneyWidth = 15; // 煙突の幅（メートル）
+            
+            // 煙突の先端位置
+            const tipPos = offsetLatLng(centerLat, centerLng, chimneyLength, fallDirection);
+            
+            // 煙突本体（太い線で表現）
+            const chimneyLine = L.polyline([
+                [centerLat, centerLng],
+                tipPos
+            ], {
+                color: '#ff9500',
+                weight: 12,
+                opacity: 0.8,
+                lineCap: 'round'
+            }).addTo(linesLayer);
+            
+            // 煙突の輪郭（外側の線）
+            L.polyline([
+                [centerLat, centerLng],
+                tipPos
+            ], {
+                color: '#cc7000',
+                weight: 16,
+                opacity: 0.5,
+                lineCap: 'round'
+            }).addTo(linesLayer);
+            
+            // 転倒方向を示す矢印（先端）
+            const arrowLength = 30;
+            const arrowAngle = 25;
+            const arrowLeft = offsetLatLng(tipPos[0], tipPos[1], arrowLength, fallDirection + 180 - arrowAngle);
+            const arrowRight = offsetLatLng(tipPos[0], tipPos[1], arrowLength, fallDirection + 180 + arrowAngle);
+            
+            L.polyline([arrowLeft, tipPos, arrowRight], {
+                color: '#ff9500',
+                weight: 6,
+                opacity: 0.9
+            }).addTo(linesLayer);
+            
+            // 煙突ラベル
+            const labelPos = offsetLatLng(centerLat, centerLng, chimneyLength / 2, fallDirection);
+            const labelOffset = offsetLatLng(labelPos[0], labelPos[1], 25, fallDirection + 90);
+            L.marker(labelOffset, {
+                icon: L.divIcon({
+                    className: 'chimney-label',
+                    html: '🏭 煙突転倒方向<br>(230m)',
+                    iconSize: [100, 40],
+                    iconAnchor: [50, 20]
+                })
+            }).addTo(linesLayer);
         }
         
         // ========== 全マーカー更新 ==========
