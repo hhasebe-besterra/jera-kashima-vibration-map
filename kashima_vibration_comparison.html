@@ -149,14 +149,14 @@
             font-size: 12px;
         }
         .legend-marker {
-            width: 22px;
-            height: 22px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             border: 2px solid #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
             color: #fff;
         }
@@ -164,7 +164,6 @@
         .legend-marker.bos-lat { background: #4a90e2; }
         .legend-marker.cmrc-back { background: #ff9500; }
         .legend-marker.cmrc-lat { background: #00d4aa; }
-        .legend-marker.cmrc-fall { background: #9b59b6; }
 
         /* 回転コントロール */
         .rotation-control {
@@ -409,24 +408,20 @@
                 <h3>凡例</h3>
                 <div class="legend-grid">
                     <div class="legend-item">
-                        <div class="legend-marker bos-back">B</div>
+                        <div class="legend-marker bos-back">B1</div>
                         <span>BOS後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker bos-lat">B</div>
+                        <div class="legend-marker bos-lat">B7</div>
                         <span>BOS横方向</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-back">R</div>
+                        <div class="legend-marker cmrc-back">R1</div>
                         <span>計算力学後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-lat">R</div>
+                        <div class="legend-marker cmrc-lat">R3</div>
                         <span>計算力学横方向</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker cmrc-fall">R</div>
-                        <span>計算力学転倒側</span>
                     </div>
                 </div>
             </div>
@@ -463,12 +458,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>20m</td><td class="marker-cell bos">①</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>50m</td><td class="marker-cell bos">②</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">③</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">B1</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell db-column">86</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">④</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">B2</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell db-column">75</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">⑤</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">⑥</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>20m</td><td class="marker-cell bos">B1</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>50m</td><td class="marker-cell bos">B2</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B3</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R1</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell db-column">86</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B4</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">R2</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell db-column">75</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B5</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B6</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -493,34 +488,13 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>50m</td><td class="marker-cell bos">⑦</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">⑧</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">C1</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell db-column">92</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">⑨</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">C2</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell db-column">83</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">⑩</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">C3</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell db-column">80</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">⑪</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>50m</td><td class="marker-cell bos">B7</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B8</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">R3</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell db-column">92</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B9</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">R4</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell db-column">83</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B10</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R5</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell db-column">80</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                     </tbody>
                 </table>
-            </div>
-
-            <!-- 転倒側（計算力学のみ）-->
-            <div class="data-section" id="fallSection">
-                <h3>転倒側（計算力学のみ）</h3>
-                <table id="fallTable">
-                    <thead>
-                        <tr>
-                            <th>距離</th>
-                            <th class="cmrc-header">No.</th>
-                            <th class="cmrc-header">加速度 [m/s²]</th>
-                            <th class="cmrc-header db-column">dB</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>100m</td><td class="marker-cell cmrc">A1</td><td class="cmrc-cell">302</td><td class="cmrc-cell db-column">124</td></tr>
-                        <tr><td>200m</td><td class="marker-cell cmrc">A2</td><td class="cmrc-cell">1620</td><td class="cmrc-cell db-column">135</td></tr>
-                        <tr><td>300m</td><td class="marker-cell cmrc">A3</td><td class="cmrc-cell">10.7</td><td class="cmrc-cell db-column">110</td></tr>
-                    </tbody>
-                </table>
-                <div class="note">※転倒側は計算力学研究センターのみ解析データあり</div>
             </div>
 
             <!-- 換算表 -->
@@ -559,37 +533,32 @@
         // BOSデータ
         const bosData = {
             backward: [
-                { id: '①', dist: 20, acc: 1.14, db: 121.2 },
-                { id: '②', dist: 50, acc: 0.85, db: 118.6 },
-                { id: '③', dist: 100, acc: 0.42, db: 112.4 },
-                { id: '④', dist: 200, acc: 0.21, db: 106.3 },
-                { id: '⑤', dist: 300, acc: 0.10, db: 100.1 },
-                { id: '⑥', dist: 400, acc: 0.07, db: 96.4 }
+                { id: 'B1', dist: 20, acc: 1.14, db: 121.2 },
+                { id: 'B2', dist: 50, acc: 0.85, db: 118.6 },
+                { id: 'B3', dist: 100, acc: 0.42, db: 112.4 },
+                { id: 'B4', dist: 200, acc: 0.21, db: 106.3 },
+                { id: 'B5', dist: 300, acc: 0.10, db: 100.1 },
+                { id: 'B6', dist: 400, acc: 0.07, db: 96.4 }
             ],
             lateral: [
-                { id: '⑦', dist: 50, acc: 2.78, db: 128.9 },
-                { id: '⑧', dist: 100, acc: 1.97, db: 125.9 },
-                { id: '⑨', dist: 200, acc: 0.46, db: 113.3 },
-                { id: '⑩', dist: 300, acc: 0.42, db: 112.4 },
-                { id: '⑪', dist: 400, acc: 0.22, db: 106.8 }
+                { id: 'B7', dist: 50, acc: 2.78, db: 128.9 },
+                { id: 'B8', dist: 100, acc: 1.97, db: 125.9 },
+                { id: 'B9', dist: 200, acc: 0.46, db: 113.3 },
+                { id: 'B10', dist: 300, acc: 0.42, db: 112.4 },
+                { id: 'B11', dist: 400, acc: 0.22, db: 106.8 }
             ]
         };
 
         // 計算力学データ
         const cmrcData = {
             backward: [
-                { id: 'B1', dist: 100, acc: 0.972, db: 86 },
-                { id: 'B2', dist: 200, acc: 0.357, db: 75 }
+                { id: 'R1', dist: 100, acc: 0.972, db: 86 },
+                { id: 'R2', dist: 200, acc: 0.357, db: 75 }
             ],
             lateral: [
-                { id: 'C1', dist: 100, acc: 2.11, db: 92 },
-                { id: 'C2', dist: 200, acc: 0.516, db: 83 },
-                { id: 'C3', dist: 300, acc: 0.374, db: 80 }
-            ],
-            fall: [
-                { id: 'A1', dist: 100, acc: 302, db: 124 },
-                { id: 'A2', dist: 200, acc: 1620, db: 135 },
-                { id: 'A3', dist: 300, acc: 10.7, db: 110 }
+                { id: 'R3', dist: 100, acc: 2.11, db: 92 },
+                { id: 'R4', dist: 200, acc: 0.516, db: 83 },
+                { id: 'R5', dist: 300, acc: 0.374, db: 80 }
             ]
         };
 
@@ -672,7 +641,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#e94560">BOS ${point.id} 後方 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -696,7 +665,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#4a90e2">BOS ${point.id} 横方向 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -720,7 +689,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#ff9500">計算力学 ${point.id} 後方 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -744,7 +713,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#00d4aa">計算力学 ${point.id} 横方向 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -753,27 +722,6 @@
                     cmrcLayer.addLayer(marker);
                 });
             }
-
-            // 計算力学 転倒側
-            cmrcData.fall.forEach(point => {
-                const fallDirection = currentRotation + 180;
-                const pos = offsetLatLng(centerLat, centerLng, point.dist, fallDirection);
-
-                const marker = L.circleMarker(pos, {
-                    radius: 16,
-                    fillColor: '#9b59b6',
-                    color: '#fff',
-                    weight: 3,
-                    fillOpacity: 0.9
-                });
-                marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
-                marker.bindPopup(`
-                    <b style="color:#9b59b6">計算力学 ${point.id} 転倒側 ${point.dist}m</b><br>
-                    加速度: <b>${point.acc} m/s²</b><br>
-                    振動レベル: <b>${point.db} dB</b>
-                `);
-                cmrcLayer.addLayer(marker);
-            });
 
             updateLayerVisibility();
         }
@@ -874,9 +822,6 @@
             document.getElementById('cmrcBtn').classList.toggle('active', company === 'cmrc');
             document.getElementById('bothBtn').classList.toggle('active', company === 'both');
 
-            document.getElementById('fallSection').style.display =
-                (company === 'cmrc' || company === 'both') ? 'block' : 'none';
-
             createMarkers();
         }
 
@@ -902,7 +847,7 @@
             document.getElementById('dbBtn').classList.toggle('active', showDb);
             document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示' : 'dB列を非表示';
 
-            const tables = ['backwardTable', 'lateralTable', 'fallTable'];
+            const tables = ['backwardTable', 'lateralTable'];
             tables.forEach(tableId => {
                 const table = document.getElementById(tableId);
                 if (table) {
@@ -925,8 +870,6 @@
         createMarkers();
         updateCircles();
         updateLines();
-
-        document.getElementById('fallSection').style.display = 'none';
 
         // マーカーラベル用スタイル
         const style = document.createElement('style');
