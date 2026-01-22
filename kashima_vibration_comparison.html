@@ -23,10 +23,11 @@
         }
         #map {
             flex: 1;
+            min-width: 45%;
             position: relative;
         }
         .sidebar {
-            width: 420px;
+            width: 520px;
             background: #16213e;
             padding: 20px;
             overflow-y: auto;
@@ -38,7 +39,7 @@
             margin-bottom: 5px;
         }
         .subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: #888;
             margin-bottom: 15px;
         }
@@ -46,22 +47,21 @@
         /* 会社切替ボタン */
         .company-toggle {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             margin-bottom: 15px;
-            flex-wrap: wrap;
         }
         .company-btn {
             flex: 1;
-            min-width: 80px;
-            padding: 12px 8px;
+            padding: 14px 10px;
             border: 2px solid #333;
             background: #1a1a2e;
             color: #888;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
             transition: all 0.3s;
+            font-weight: bold;
         }
         .company-btn.active {
             color: #fff;
@@ -93,7 +93,7 @@
             color: #888;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             text-align: center;
             transition: all 0.3s;
         }
@@ -111,14 +111,14 @@
             margin-bottom: 15px;
         }
         .legend h3 {
-            font-size: 13px;
+            font-size: 14px;
             color: #94d2bd;
             margin-bottom: 10px;
         }
         .legend-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
         }
         .legend-item {
             display: flex;
@@ -127,8 +127,8 @@
             font-size: 12px;
         }
         .legend-marker {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: 2px solid #fff;
             display: flex;
@@ -142,67 +142,7 @@
         .legend-marker.bos-lat { background: #4a90e2; }
         .legend-marker.cmrc-back { background: #ff9500; }
         .legend-marker.cmrc-lat { background: #00d4aa; }
-
-        /* 比較テーブル */
-        h2 {
-            font-size: 15px;
-            color: #94d2bd;
-            margin: 15px 0 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #333;
-        }
-        .comparison-section {
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 11px;
-            margin-bottom: 10px;
-        }
-        th, td {
-            padding: 6px 4px;
-            text-align: center;
-            border-bottom: 1px solid #333;
-        }
-        th {
-            background: #1a1a2e;
-            color: #94d2bd;
-            font-weight: bold;
-            font-size: 10px;
-        }
-        .bos-cell {
-            color: #e94560;
-            font-weight: bold;
-        }
-        .cmrc-cell {
-            color: #00d4aa;
-            font-weight: bold;
-        }
-        .diff-cell {
-            color: #ffa502;
-            font-weight: bold;
-        }
-        .diff-positive { color: #ff6b6b; }
-        .diff-negative { color: #4ecdc4; }
-
-        /* 操作説明ボックス */
-        .info-box {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: rgba(22, 33, 62, 0.95);
-            border: 2px solid #ffa502;
-            border-radius: 8px;
-            padding: 12px;
-            font-size: 11px;
-            line-height: 1.5;
-            z-index: 1000;
-            max-width: 260px;
-        }
-        .info-box strong {
-            color: #ffa502;
-        }
+        .legend-marker.cmrc-fall { background: #9b59b6; }
 
         /* 回転コントロール */
         .rotation-control {
@@ -216,15 +156,19 @@
             color: #ffa502;
             margin-bottom: 8px;
         }
+        .rotation-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
         .rotation-value {
-            text-align: center;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #ffa502;
-            margin-bottom: 8px;
+            min-width: 50px;
         }
         .rotation-slider {
-            width: 100%;
+            flex: 1;
             height: 8px;
             -webkit-appearance: none;
             background: linear-gradient(to right, #e94560, #ffa502, #94d2bd, #4a90e2, #e94560);
@@ -233,50 +177,161 @@
         }
         .rotation-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             background: #fff;
             border-radius: 50%;
             cursor: pointer;
             box-shadow: 0 0 10px rgba(255,165,2,0.5);
         }
 
-        /* 注釈 */
-        .note {
-            background: rgba(255, 165, 2, 0.1);
-            border: 1px solid #ffa502;
-            border-radius: 6px;
-            padding: 10px;
-            font-size: 11px;
-            color: #ffa502;
-            margin-top: 15px;
+        /* セクションタイトル */
+        h2 {
+            font-size: 16px;
+            color: #94d2bd;
+            margin: 20px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #333;
         }
-        .note strong {
-            display: block;
-            margin-bottom: 5px;
+
+        /* データテーブル */
+        .data-section {
+            margin-bottom: 20px;
+        }
+        .data-section h3 {
+            font-size: 14px;
+            color: #ffa502;
+            margin-bottom: 8px;
+            padding-left: 5px;
+            border-left: 3px solid #ffa502;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 10px 8px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: #1a1a2e;
+            color: #94d2bd;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .bos-header {
+            background: rgba(233, 69, 96, 0.3);
+            color: #e94560;
+        }
+        .cmrc-header {
+            background: rgba(0, 212, 170, 0.3);
+            color: #00d4aa;
+        }
+        td {
+            font-weight: 600;
+        }
+        .point-cell {
+            font-weight: bold;
+            text-align: left;
+            padding-left: 12px;
+        }
+        .bos-cell {
+            color: #ff6b6b;
+        }
+        .cmrc-cell {
+            color: #4ecdc4;
+        }
+        .na-cell {
+            color: #666;
+        }
+
+        /* 換算表 */
+        .conversion-table {
+            background: rgba(148, 210, 189, 0.1);
+            border: 2px solid #94d2bd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .conversion-table h3 {
+            font-size: 15px;
+            color: #94d2bd;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .conversion-table table {
+            margin-bottom: 12px;
+            background: transparent;
+        }
+        .conversion-table th {
+            background: rgba(148, 210, 189, 0.2);
+        }
+        .formula {
+            text-align: center;
+            font-size: 16px;
+            color: #ffa502;
+            font-weight: bold;
+            padding: 10px;
+            background: rgba(255, 165, 2, 0.1);
+            border-radius: 6px;
+        }
+
+        /* 操作説明 */
+        .info-box {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(22, 33, 62, 0.95);
+            border: 2px solid #ffa502;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 11px;
+            line-height: 1.6;
+            z-index: 1000;
+            max-width: 240px;
+        }
+        .info-box strong {
+            color: #ffa502;
+            font-size: 12px;
         }
 
         /* マーカースタイル */
         .center-marker {
             background: #e94560;
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             border: 3px solid #fff;
-            box-shadow: 0 0 15px rgba(233,69,96,0.8);
+            box-shadow: 0 0 20px rgba(233,69,96,0.8);
         }
-
-        /* 煙突転倒ラベル */
         .chimney-label {
             background: rgba(255, 149, 0, 0.9);
             border: 2px solid #cc7000;
             border-radius: 6px;
-            padding: 4px 8px;
+            padding: 4px 10px;
             color: #000;
             font-size: 11px;
             font-weight: bold;
             text-align: center;
             white-space: nowrap;
+        }
+
+        /* 注釈 */
+        .note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -286,7 +341,7 @@
             <div class="info-box">
                 <strong>BOS vs 計算力学 比較マップ</strong><br>
                 ・会社ボタンで表示切替<br>
-                ・マーカーをクリックで詳細<br>
+                ・マーカークリックで詳細<br>
                 ・「両方」で同一地点比較<br>
                 ・回転スライダーで方向調整
             </div>
@@ -310,9 +365,9 @@
 
             <!-- 方向切替 -->
             <div class="direction-toggle">
-                <button class="direction-btn active" id="allDirBtn" onclick="setDirection('all')">全て</button>
-                <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方のみ</button>
-                <button class="direction-btn" id="lateralDirBtn" onclick="setDirection('lateral')">横方向のみ</button>
+                <button class="direction-btn active" id="allDirBtn" onclick="setDirection('all')">全方向</button>
+                <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方(タービン側)</button>
+                <button class="direction-btn" id="lateralDirBtn" onclick="setDirection('lateral')">横方向(道路側)</button>
             </div>
 
             <!-- 凡例 -->
@@ -321,19 +376,23 @@
                 <div class="legend-grid">
                     <div class="legend-item">
                         <div class="legend-marker bos-back">B</div>
-                        <span>BOS 後方</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker cmrc-back">C</div>
-                        <span>計算力学 後方</span>
+                        <span>BOS後方</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-marker bos-lat">B</div>
-                        <span>BOS 横方向</span>
+                        <span>BOS横方向</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker cmrc-back">C</div>
+                        <span>計算力学後方</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-marker cmrc-lat">C</div>
-                        <span>計算力学 横方向</span>
+                        <span>計算力学横方向</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker cmrc-fall">C</div>
+                        <span>計算力学転倒側</span>
                     </div>
                 </div>
             </div>
@@ -341,94 +400,110 @@
             <!-- 回転コントロール -->
             <div class="rotation-control">
                 <h3>全体回転</h3>
-                <div class="rotation-value" id="rotationValue">153°</div>
-                <input type="range" class="rotation-slider" id="rotationSlider" min="0" max="360" value="153">
+                <div class="rotation-row">
+                    <div class="rotation-value" id="rotationValue">153°</div>
+                    <input type="range" class="rotation-slider" id="rotationSlider" min="0" max="360" value="153">
+                </div>
             </div>
 
-            <!-- 比較表：後方 -->
-            <div class="comparison-section" id="backwardSection">
-                <h2>後方（タービン側）比較</h2>
+            <!-- 解析結果テーブル -->
+            <h2>解析結果一覧</h2>
+
+            <!-- 後方（タービン側）-->
+            <div class="data-section" id="backwardSection">
+                <h3>後方（タービン側）</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>距離</th>
-                            <th>BOS<br>加速度</th>
-                            <th>計算力学<br>加速度</th>
-                            <th>差異</th>
-                            <th>BOS<br>dB</th>
-                            <th>計算力学<br>dB</th>
+                            <th rowspan="2">距離</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">計算力学</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header">dB</th>
+                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>100m</td>
-                            <td class="bos-cell">0.42</td>
-                            <td class="cmrc-cell">0.972</td>
-                            <td class="diff-cell diff-positive">+131%</td>
-                            <td class="bos-cell">112.4</td>
-                            <td class="cmrc-cell">86</td>
-                        </tr>
-                        <tr>
-                            <td>200m</td>
-                            <td class="bos-cell">0.21</td>
-                            <td class="cmrc-cell">0.357</td>
-                            <td class="diff-cell diff-positive">+70%</td>
-                            <td class="bos-cell">106.3</td>
-                            <td class="cmrc-cell">75</td>
-                        </tr>
+                        <tr><td>20m</td><td class="bos-cell">1.14</td><td class="bos-cell">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>50m</td><td class="bos-cell">0.85</td><td class="bos-cell">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">0.42</td><td class="bos-cell">112.4</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell">86</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.21</td><td class="bos-cell">106.3</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell">75</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.10</td><td class="bos-cell">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.07</td><td class="bos-cell">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 比較表：横方向 -->
-            <div class="comparison-section" id="lateralSection">
-                <h2>横方向（道路側）比較</h2>
+            <!-- 横方向（道路側）-->
+            <div class="data-section" id="lateralSection">
+                <h3>横方向（道路側）</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>距離</th>
-                            <th>BOS<br>加速度</th>
-                            <th>計算力学<br>加速度</th>
-                            <th>差異</th>
-                            <th>BOS<br>dB</th>
-                            <th>計算力学<br>dB</th>
+                            <th rowspan="2">距離</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">計算力学</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header">dB</th>
+                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>100m</td>
-                            <td class="bos-cell">1.97</td>
-                            <td class="cmrc-cell">2.11</td>
-                            <td class="diff-cell diff-positive">+7%</td>
-                            <td class="bos-cell">125.9</td>
-                            <td class="cmrc-cell">92</td>
-                        </tr>
-                        <tr>
-                            <td>200m</td>
-                            <td class="bos-cell">0.46</td>
-                            <td class="cmrc-cell">0.516</td>
-                            <td class="diff-cell diff-positive">+12%</td>
-                            <td class="bos-cell">113.3</td>
-                            <td class="cmrc-cell">83</td>
-                        </tr>
-                        <tr>
-                            <td>300m</td>
-                            <td class="bos-cell">0.42</td>
-                            <td class="cmrc-cell">0.374</td>
-                            <td class="diff-cell diff-negative">-11%</td>
-                            <td class="bos-cell">112.4</td>
-                            <td class="cmrc-cell">80</td>
-                        </tr>
+                        <tr><td>50m</td><td class="bos-cell">2.78</td><td class="bos-cell">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">1.97</td><td class="bos-cell">125.9</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell">92</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.46</td><td class="bos-cell">113.3</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell">83</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.42</td><td class="bos-cell">112.4</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell">80</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.22</td><td class="bos-cell">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 注釈 -->
-            <div class="note">
-                <strong>※注釈</strong>
-                計算力学研究センターの加速度はgalからm/s²に変換済み<br>
-                (1 gal = 0.01 m/s²)<br>
-                差異(%) = (計算力学 - BOS) / BOS × 100
+            <!-- 転倒側（計算力学のみ）-->
+            <div class="data-section" id="fallSection">
+                <h3>転倒側（計算力学のみ）</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>距離</th>
+                            <th class="cmrc-header">加速度 [m/s²]</th>
+                            <th class="cmrc-header">dB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>100m (A1)</td><td class="cmrc-cell">302</td><td class="cmrc-cell">124</td></tr>
+                        <tr><td>200m (A2)</td><td class="cmrc-cell">1620</td><td class="cmrc-cell">135</td></tr>
+                        <tr><td>300m (A3)</td><td class="cmrc-cell">10.7</td><td class="cmrc-cell">110</td></tr>
+                    </tbody>
+                </table>
+                <div class="note">※転倒側は計算力学研究センターのみ解析データあり</div>
+            </div>
+
+            <!-- 換算表 -->
+            <div class="conversion-table">
+                <h3>加速度・dB・震度 換算表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>加速度 [m/s²]</th>
+                            <th>dB</th>
+                            <th>震度（目安）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.001</td><td>60</td><td>0</td></tr>
+                        <tr><td>0.01</td><td>80</td><td>1</td></tr>
+                        <tr><td>0.1</td><td>100</td><td>2〜3</td></tr>
+                        <tr><td>1</td><td>120</td><td>3〜4</td></tr>
+                        <tr><td>10</td><td>140</td><td>5強〜6弱</td></tr>
+                    </tbody>
+                </table>
+                <div class="formula">1 m/s² = 120 dB</div>
             </div>
         </div>
     </div>
@@ -438,19 +513,43 @@
         let centerLat = 35.917924;
         let centerLng = 140.698911;
         let currentRotation = 153;
-        let currentCompany = 'bos'; // 'bos', 'cmrc', 'both'
-        let currentDirection = 'all'; // 'all', 'backward', 'lateral'
+        let currentCompany = 'bos';
+        let currentDirection = 'all';
 
-        // 比較データ（Excelから）
-        const comparisonData = {
+        // BOSデータ
+        const bosData = {
             backward: [
-                { dist: 100, bos: { acc: 0.42, db: 112.4, id: '③' }, cmrc: { acc: 0.972, db: 86, id: 'B1' } },
-                { dist: 200, bos: { acc: 0.21, db: 106.3, id: '④' }, cmrc: { acc: 0.357, db: 75, id: 'B2' } }
+                { id: '①', dist: 20, acc: 1.14, db: 121.2 },
+                { id: '②', dist: 50, acc: 0.85, db: 118.6 },
+                { id: '③', dist: 100, acc: 0.42, db: 112.4 },
+                { id: '④', dist: 200, acc: 0.21, db: 106.3 },
+                { id: '⑤', dist: 300, acc: 0.10, db: 100.1 },
+                { id: '⑥', dist: 400, acc: 0.07, db: 96.4 }
             ],
             lateral: [
-                { dist: 100, bos: { acc: 1.97, db: 125.9, id: '⑧' }, cmrc: { acc: 2.11, db: 92, id: 'C1' } },
-                { dist: 200, bos: { acc: 0.46, db: 113.3, id: '⑨' }, cmrc: { acc: 0.516, db: 83, id: 'C2' } },
-                { dist: 300, bos: { acc: 0.42, db: 112.4, id: '⑩' }, cmrc: { acc: 0.374, db: 80, id: 'C3' } }
+                { id: '⑦', dist: 50, acc: 2.78, db: 128.9 },
+                { id: '⑧', dist: 100, acc: 1.97, db: 125.9 },
+                { id: '⑨', dist: 200, acc: 0.46, db: 113.3 },
+                { id: '⑩', dist: 300, acc: 0.42, db: 112.4 },
+                { id: '⑪', dist: 400, acc: 0.22, db: 106.8 }
+            ]
+        };
+
+        // 計算力学データ
+        const cmrcData = {
+            backward: [
+                { id: 'B1', dist: 100, acc: 0.972, db: 86 },
+                { id: 'B2', dist: 200, acc: 0.357, db: 75 }
+            ],
+            lateral: [
+                { id: 'C1', dist: 100, acc: 2.11, db: 92 },
+                { id: 'C2', dist: 200, acc: 0.516, db: 83 },
+                { id: 'C3', dist: 300, acc: 0.374, db: 80 }
+            ],
+            fall: [
+                { id: 'A1', dist: 100, acc: 302, db: 124 },
+                { id: 'A2', dist: 200, acc: 1620, db: 135 },
+                { id: 'A3', dist: 300, acc: 10.7, db: 110 }
             ]
         };
 
@@ -461,7 +560,6 @@
             zoomControl: true
         });
 
-        // タイルレイヤー
         const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
             attribution: '© Esri'
         });
@@ -471,7 +569,6 @@
         satelliteLayer.addTo(map);
         L.control.layers({ "航空写真": satelliteLayer, "地図": osmLayer }).addTo(map);
 
-        // レイヤーグループ
         const bosLayer = L.layerGroup().addTo(map);
         const cmrcLayer = L.layerGroup();
         const circlesLayer = L.layerGroup().addTo(map);
@@ -501,8 +598,8 @@
         function createCenterMarker() {
             const icon = L.divIcon({
                 className: 'center-marker',
-                iconSize: [24, 24],
-                iconAnchor: [12, 12]
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
             });
 
             centerMarker = L.marker([centerLat, centerLng], {
@@ -521,96 +618,122 @@
             const showBackward = currentDirection === 'all' || currentDirection === 'backward';
             const showLateral = currentDirection === 'all' || currentDirection === 'lateral';
 
-            // 後方マーカー
+            // BOS 後方
             if (showBackward) {
-                comparisonData.backward.forEach(point => {
+                bosData.backward.forEach(point => {
                     const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 90) : basePos;
 
-                    // BOS マーカー（両方表示時は少し左にずらす）
-                    const bosOffset = currentCompany === 'both' ? -10 : 0;
-                    const bosPos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 15, currentRotation + 90) : basePos;
-
-                    const bosMarker = L.circleMarker(bosPos, {
-                        radius: 18,
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
                         fillColor: '#e94560',
                         color: '#fff',
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    bosMarker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
-                    bosMarker.bindPopup(`
-                        <b style="color:#e94560">BOS ${point.bos.id} 後方 ${point.dist}m</b><br>
-                        加速度: <b>${point.bos.acc} m/s²</b><br>
-                        振動レベル: <b>${point.bos.db} dB</b>
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#e94560">BOS ${point.id} 後方 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
                     `);
-                    bosLayer.addLayer(bosMarker);
-
-                    // 計算力学マーカー（両方表示時は少し右にずらす）
-                    const cmrcPos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 15, currentRotation - 90) : basePos;
-
-                    const cmrcMarker = L.circleMarker(cmrcPos, {
-                        radius: 18,
-                        fillColor: '#ff9500',
-                        color: '#fff',
-                        weight: 3,
-                        fillOpacity: 0.9
-                    });
-                    cmrcMarker.bindTooltip('C', { permanent: true, direction: 'center', className: 'marker-label' });
-                    cmrcMarker.bindPopup(`
-                        <b style="color:#ff9500">計算力学 ${point.cmrc.id} 後方 ${point.dist}m</b><br>
-                        加速度: <b>${point.cmrc.acc} m/s²</b><br>
-                        振動レベル: <b>${point.cmrc.db} dB</b>
-                    `);
-                    cmrcLayer.addLayer(cmrcMarker);
+                    bosLayer.addLayer(marker);
                 });
             }
 
-            // 横方向マーカー
+            // BOS 横方向
             if (showLateral) {
-                comparisonData.lateral.forEach(point => {
+                bosData.lateral.forEach(point => {
                     const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation) : basePos;
 
-                    // BOS マーカー
-                    const bosPos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 15, currentRotation) : basePos;
-
-                    const bosMarker = L.circleMarker(bosPos, {
-                        radius: 18,
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
                         fillColor: '#4a90e2',
                         color: '#fff',
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    bosMarker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
-                    bosMarker.bindPopup(`
-                        <b style="color:#4a90e2">BOS ${point.bos.id} 横方向 ${point.dist}m</b><br>
-                        加速度: <b>${point.bos.acc} m/s²</b><br>
-                        振動レベル: <b>${point.bos.db} dB</b>
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#4a90e2">BOS ${point.id} 横方向 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
                     `);
-                    bosLayer.addLayer(bosMarker);
+                    bosLayer.addLayer(marker);
+                });
+            }
 
-                    // 計算力学マーカー
-                    const cmrcPos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 15, currentRotation + 180) : basePos;
+            // 計算力学 後方
+            if (showBackward) {
+                cmrcData.backward.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation - 90) : basePos;
 
-                    const cmrcMarker = L.circleMarker(cmrcPos, {
-                        radius: 18,
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
+                        fillColor: '#ff9500',
+                        color: '#fff',
+                        weight: 3,
+                        fillOpacity: 0.9
+                    });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#ff9500">計算力学 ${point.id} 後方 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
+                    `);
+                    cmrcLayer.addLayer(marker);
+                });
+            }
+
+            // 計算力学 横方向
+            if (showLateral) {
+                cmrcData.lateral.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 180) : basePos;
+
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
                         fillColor: '#00d4aa',
                         color: '#fff',
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    cmrcMarker.bindTooltip('C', { permanent: true, direction: 'center', className: 'marker-label' });
-                    cmrcMarker.bindPopup(`
-                        <b style="color:#00d4aa">計算力学 ${point.cmrc.id} 横方向 ${point.dist}m</b><br>
-                        加速度: <b>${point.cmrc.acc} m/s²</b><br>
-                        振動レベル: <b>${point.cmrc.db} dB</b>
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#00d4aa">計算力学 ${point.id} 横方向 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
                     `);
-                    cmrcLayer.addLayer(cmrcMarker);
+                    cmrcLayer.addLayer(marker);
                 });
             }
+
+            // 計算力学 転倒側（常に表示）
+            cmrcData.fall.forEach(point => {
+                const fallDirection = currentRotation + 180;
+                const pos = offsetLatLng(centerLat, centerLng, point.dist, fallDirection);
+
+                const marker = L.circleMarker(pos, {
+                    radius: 16,
+                    fillColor: '#9b59b6',
+                    color: '#fff',
+                    weight: 3,
+                    fillOpacity: 0.9
+                });
+                marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                marker.bindPopup(`
+                    <b style="color:#9b59b6">計算力学 ${point.id} 転倒側 ${point.dist}m</b><br>
+                    加速度: <b>${point.acc} m/s²</b><br>
+                    振動レベル: <b>${point.db} dB</b>
+                `);
+                cmrcLayer.addLayer(marker);
+            });
 
             updateLayerVisibility();
         }
@@ -618,8 +741,8 @@
         // ========== 同心円・接続線 ==========
         function updateCircles() {
             circlesLayer.clearLayers();
-            const distances = [100, 200, 300];
-            const colors = ['#ffa502', '#94d2bd', '#4a90e2'];
+            const distances = [50, 100, 200, 300, 400];
+            const colors = ['#ff6b6b', '#ffa502', '#94d2bd', '#4a90e2', '#9b59b6'];
 
             distances.forEach((dist, i) => {
                 const circlePoints = [];
@@ -629,19 +752,18 @@
 
                 L.polyline(circlePoints, {
                     color: colors[i],
-                    weight: 3,
-                    opacity: 0.7,
-                    dashArray: '8, 5'
+                    weight: 2,
+                    opacity: 0.6,
+                    dashArray: '6, 4'
                 }).addTo(circlesLayer);
 
-                // 距離ラベル
                 const labelPos = offsetLatLng(centerLat, centerLng, dist, currentRotation - 45);
                 L.marker(labelPos, {
                     icon: L.divIcon({
                         className: 'distance-label',
                         html: `${dist}m`,
-                        iconSize: [40, 16],
-                        iconAnchor: [20, 8]
+                        iconSize: [36, 14],
+                        iconAnchor: [18, 7]
                     })
                 }).addTo(circlesLayer);
             });
@@ -651,20 +773,20 @@
             linesLayer.clearLayers();
 
             // 後方接続線
-            const backwardEnd = offsetLatLng(centerLat, centerLng, 220, currentRotation);
+            const backwardEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation);
             L.polyline([[centerLat, centerLng], backwardEnd], {
                 color: '#e94560',
-                weight: 3,
-                opacity: 0.6,
+                weight: 2,
+                opacity: 0.5,
                 dashArray: '5, 5'
             }).addTo(linesLayer);
 
             // 横方向接続線
-            const lateralEnd = offsetLatLng(centerLat, centerLng, 320, currentRotation + 90);
+            const lateralEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation + 90);
             L.polyline([[centerLat, centerLng], lateralEnd], {
                 color: '#4a90e2',
-                weight: 3,
-                opacity: 0.6,
+                weight: 2,
+                opacity: 0.5,
                 dashArray: '5, 5'
             }).addTo(linesLayer);
 
@@ -674,7 +796,7 @@
 
             L.polyline([[centerLat, centerLng], tipPos], {
                 color: '#ff9500',
-                weight: 10,
+                weight: 12,
                 opacity: 0.8,
                 lineCap: 'round'
             }).addTo(linesLayer);
@@ -684,8 +806,8 @@
                 icon: L.divIcon({
                     className: 'chimney-label',
                     html: '煙突転倒方向(230m)',
-                    iconSize: [120, 24],
-                    iconAnchor: [60, 12]
+                    iconSize: [130, 24],
+                    iconAnchor: [65, 12]
                 })
             }).addTo(linesLayer);
         }
@@ -712,6 +834,10 @@
             document.getElementById('cmrcBtn').classList.toggle('active', company === 'cmrc');
             document.getElementById('bothBtn').classList.toggle('active', company === 'both');
 
+            // 転倒側セクションの表示
+            document.getElementById('fallSection').style.display =
+                (company === 'cmrc' || company === 'both') ? 'block' : 'none';
+
             createMarkers();
         }
 
@@ -723,7 +849,6 @@
             document.getElementById('backwardDirBtn').classList.toggle('active', direction === 'backward');
             document.getElementById('lateralDirBtn').classList.toggle('active', direction === 'lateral');
 
-            // テーブル表示切替
             document.getElementById('backwardSection').style.display =
                 (direction === 'all' || direction === 'backward') ? 'block' : 'none';
             document.getElementById('lateralSection').style.display =
@@ -747,6 +872,9 @@
         updateCircles();
         updateLines();
 
+        // 初期表示で転倒側セクションを非表示
+        document.getElementById('fallSection').style.display = 'none';
+
         // マーカーラベル用スタイル
         const style = document.createElement('style');
         style.textContent = `
@@ -762,7 +890,7 @@
                 background: rgba(0,0,0,0.7);
                 border: none;
                 border-radius: 4px;
-                padding: 2px 6px;
+                padding: 2px 5px;
                 color: #fff;
                 font-size: 10px;
                 font-weight: bold;
