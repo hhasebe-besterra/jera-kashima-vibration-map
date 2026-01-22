@@ -279,6 +279,32 @@
             display: none;
         }
 
+        /* 説明資料リンク */
+        .explanation-link {
+            margin: 20px 0;
+        }
+        .explanation-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .explanation-btn:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
         /* 換算表 */
         .conversion-table {
             background: rgba(148, 210, 189, 0.1);
@@ -495,6 +521,13 @@
                         <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- 解析結果の差異説明リンク -->
+            <div class="explanation-link">
+                <a href="comparison_explanation.pptx" target="_blank" class="explanation-btn">
+                    解析結果の差異についての説明資料（PPTX）
+                </a>
             </div>
 
             <!-- 換算表 -->
