@@ -103,6 +103,28 @@
             background: rgba(148, 210, 189, 0.2);
         }
 
+        /* dB表示切替ボタン */
+        .db-toggle {
+            margin-bottom: 15px;
+        }
+        .db-btn {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .db-btn.active {
+            border-color: #9b59b6;
+            color: #fff;
+            background: rgba(155, 89, 182, 0.2);
+        }
+
         /* 凡例 */
         .legend {
             background: #1a1a2e;
@@ -215,7 +237,7 @@
             overflow: hidden;
         }
         th, td {
-            padding: 10px 8px;
+            padding: 10px 6px;
             text-align: center;
             border-bottom: 1px solid #333;
         }
@@ -223,7 +245,7 @@
             background: #1a1a2e;
             color: #94d2bd;
             font-weight: bold;
-            font-size: 12px;
+            font-size: 11px;
         }
         .bos-header {
             background: rgba(233, 69, 96, 0.3);
@@ -236,11 +258,12 @@
         td {
             font-weight: 600;
         }
-        .point-cell {
+        .marker-cell {
             font-weight: bold;
-            text-align: left;
-            padding-left: 12px;
+            font-size: 12px;
         }
+        .marker-cell.bos { color: #e94560; }
+        .marker-cell.cmrc { color: #00d4aa; }
         .bos-cell {
             color: #ff6b6b;
         }
@@ -249,6 +272,12 @@
         }
         .na-cell {
             color: #666;
+        }
+        .db-column {
+            transition: opacity 0.3s;
+        }
+        .db-hidden .db-column {
+            display: none;
         }
 
         /* 換算表 */
@@ -340,9 +369,9 @@
         <div id="map">
             <div class="info-box">
                 <strong>BOS vs 計算力学 比較マップ</strong><br>
+                ・B = BOS, R = 計算力学<br>
                 ・会社ボタンで表示切替<br>
                 ・マーカークリックで詳細<br>
-                ・「両方」で同一地点比較<br>
                 ・回転スライダーで方向調整
             </div>
         </div>
@@ -353,10 +382,10 @@
             <!-- 会社切替 -->
             <div class="company-toggle">
                 <button class="company-btn bos-btn active" id="bosBtn" onclick="setCompany('bos')">
-                    BOS<br><small>実測値</small>
+                    BOS (B)<br><small>実測値</small>
                 </button>
                 <button class="company-btn cmrc-btn" id="cmrcBtn" onclick="setCompany('cmrc')">
-                    計算力学<br><small>解析値</small>
+                    計算力学 (R)<br><small>解析値</small>
                 </button>
                 <button class="company-btn both-btn" id="bothBtn" onclick="setCompany('both')">
                     両方比較<br><small>並列表示</small>
@@ -368,6 +397,11 @@
                 <button class="direction-btn active" id="allDirBtn" onclick="setDirection('all')">全方向</button>
                 <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方(タービン側)</button>
                 <button class="direction-btn" id="lateralDirBtn" onclick="setDirection('lateral')">横方向(道路側)</button>
+            </div>
+
+            <!-- dB表示切替 -->
+            <div class="db-toggle">
+                <button class="db-btn active" id="dbBtn" onclick="toggleDb()">dB列を表示</button>
             </div>
 
             <!-- 凡例 -->
@@ -383,15 +417,15 @@
                         <span>BOS横方向</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-back">C</div>
+                        <div class="legend-marker cmrc-back">R</div>
                         <span>計算力学後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-lat">C</div>
+                        <div class="legend-marker cmrc-lat">R</div>
                         <span>計算力学横方向</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-fall">C</div>
+                        <div class="legend-marker cmrc-fall">R</div>
                         <span>計算力学転倒側</span>
                     </div>
                 </div>
@@ -412,27 +446,29 @@
             <!-- 後方（タービン側）-->
             <div class="data-section" id="backwardSection">
                 <h3>後方（タービン側）</h3>
-                <table>
+                <table id="backwardTable">
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">計算力学</th>
+                            <th colspan="3" class="bos-header">BOS (B)</th>
+                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
                         </tr>
                         <tr>
+                            <th class="bos-header">No.</th>
                             <th class="bos-header">加速度<br>[m/s²]</th>
-                            <th class="bos-header">dB</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">No.</th>
                             <th class="cmrc-header">加速度<br>[m/s²]</th>
-                            <th class="cmrc-header">dB</th>
+                            <th class="cmrc-header db-column">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>20m</td><td class="bos-cell">1.14</td><td class="bos-cell">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
-                        <tr><td>50m</td><td class="bos-cell">0.85</td><td class="bos-cell">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">0.42</td><td class="bos-cell">112.4</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell">86</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.21</td><td class="bos-cell">106.3</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell">75</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.10</td><td class="bos-cell">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.07</td><td class="bos-cell">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>20m</td><td class="marker-cell bos">①</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>50m</td><td class="marker-cell bos">②</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">③</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">B1</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell db-column">86</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">④</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">B2</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell db-column">75</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">⑤</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">⑥</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -440,26 +476,28 @@
             <!-- 横方向（道路側）-->
             <div class="data-section" id="lateralSection">
                 <h3>横方向（道路側）</h3>
-                <table>
+                <table id="lateralTable">
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">計算力学</th>
+                            <th colspan="3" class="bos-header">BOS (B)</th>
+                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
                         </tr>
                         <tr>
+                            <th class="bos-header">No.</th>
                             <th class="bos-header">加速度<br>[m/s²]</th>
-                            <th class="bos-header">dB</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">No.</th>
                             <th class="cmrc-header">加速度<br>[m/s²]</th>
-                            <th class="cmrc-header">dB</th>
+                            <th class="cmrc-header db-column">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>50m</td><td class="bos-cell">2.78</td><td class="bos-cell">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">1.97</td><td class="bos-cell">125.9</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell">92</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.46</td><td class="bos-cell">113.3</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell">83</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.42</td><td class="bos-cell">112.4</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell">80</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.22</td><td class="bos-cell">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td></tr>
+                        <tr><td>50m</td><td class="marker-cell bos">⑦</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">⑧</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">C1</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell db-column">92</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">⑨</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">C2</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell db-column">83</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">⑩</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">C3</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell db-column">80</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">⑪</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -467,18 +505,19 @@
             <!-- 転倒側（計算力学のみ）-->
             <div class="data-section" id="fallSection">
                 <h3>転倒側（計算力学のみ）</h3>
-                <table>
+                <table id="fallTable">
                     <thead>
                         <tr>
                             <th>距離</th>
+                            <th class="cmrc-header">No.</th>
                             <th class="cmrc-header">加速度 [m/s²]</th>
-                            <th class="cmrc-header">dB</th>
+                            <th class="cmrc-header db-column">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>100m (A1)</td><td class="cmrc-cell">302</td><td class="cmrc-cell">124</td></tr>
-                        <tr><td>200m (A2)</td><td class="cmrc-cell">1620</td><td class="cmrc-cell">135</td></tr>
-                        <tr><td>300m (A3)</td><td class="cmrc-cell">10.7</td><td class="cmrc-cell">110</td></tr>
+                        <tr><td>100m</td><td class="marker-cell cmrc">A1</td><td class="cmrc-cell">302</td><td class="cmrc-cell db-column">124</td></tr>
+                        <tr><td>200m</td><td class="marker-cell cmrc">A2</td><td class="cmrc-cell">1620</td><td class="cmrc-cell db-column">135</td></tr>
+                        <tr><td>300m</td><td class="marker-cell cmrc">A3</td><td class="cmrc-cell">10.7</td><td class="cmrc-cell db-column">110</td></tr>
                     </tbody>
                 </table>
                 <div class="note">※転倒側は計算力学研究センターのみ解析データあり</div>
@@ -515,6 +554,7 @@
         let currentRotation = 153;
         let currentCompany = 'bos';
         let currentDirection = 'all';
+        let showDb = true;
 
         // BOSデータ
         const bosData = {
@@ -632,7 +672,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#e94560">BOS ${point.id} 後方 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -656,7 +696,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip('B', { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#4a90e2">BOS ${point.id} 横方向 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -680,7 +720,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#ff9500">計算力学 ${point.id} 後方 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -704,7 +744,7 @@
                         weight: 3,
                         fillOpacity: 0.9
                     });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:#00d4aa">計算力学 ${point.id} 横方向 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
@@ -714,7 +754,7 @@
                 });
             }
 
-            // 計算力学 転倒側（常に表示）
+            // 計算力学 転倒側
             cmrcData.fall.forEach(point => {
                 const fallDirection = currentRotation + 180;
                 const pos = offsetLatLng(centerLat, centerLng, point.dist, fallDirection);
@@ -726,7 +766,7 @@
                     weight: 3,
                     fillOpacity: 0.9
                 });
-                marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                marker.bindTooltip('R', { permanent: true, direction: 'center', className: 'marker-label' });
                 marker.bindPopup(`
                     <b style="color:#9b59b6">計算力学 ${point.id} 転倒側 ${point.dist}m</b><br>
                     加速度: <b>${point.acc} m/s²</b><br>
@@ -752,9 +792,9 @@
 
                 L.polyline(circlePoints, {
                     color: colors[i],
-                    weight: 2,
-                    opacity: 0.6,
-                    dashArray: '6, 4'
+                    weight: 4,
+                    opacity: 0.9,
+                    dashArray: '10, 6'
                 }).addTo(circlesLayer);
 
                 const labelPos = offsetLatLng(centerLat, centerLng, dist, currentRotation - 45);
@@ -776,18 +816,18 @@
             const backwardEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation);
             L.polyline([[centerLat, centerLng], backwardEnd], {
                 color: '#e94560',
-                weight: 2,
-                opacity: 0.5,
-                dashArray: '5, 5'
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
             }).addTo(linesLayer);
 
             // 横方向接続線
             const lateralEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation + 90);
             L.polyline([[centerLat, centerLng], lateralEnd], {
                 color: '#4a90e2',
-                weight: 2,
-                opacity: 0.5,
-                dashArray: '5, 5'
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
             }).addTo(linesLayer);
 
             // 煙突転倒表示
@@ -834,7 +874,6 @@
             document.getElementById('cmrcBtn').classList.toggle('active', company === 'cmrc');
             document.getElementById('bothBtn').classList.toggle('active', company === 'both');
 
-            // 転倒側セクションの表示
             document.getElementById('fallSection').style.display =
                 (company === 'cmrc' || company === 'both') ? 'block' : 'none';
 
@@ -857,6 +896,21 @@
             createMarkers();
         }
 
+        // ========== dB表示切替 ==========
+        function toggleDb() {
+            showDb = !showDb;
+            document.getElementById('dbBtn').classList.toggle('active', showDb);
+            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示' : 'dB列を非表示';
+
+            const tables = ['backwardTable', 'lateralTable', 'fallTable'];
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                if (table) {
+                    table.classList.toggle('db-hidden', !showDb);
+                }
+            });
+        }
+
         // ========== 回転スライダー ==========
         document.getElementById('rotationSlider').addEventListener('input', function(e) {
             currentRotation = parseInt(e.target.value);
@@ -872,7 +926,6 @@
         updateCircles();
         updateLines();
 
-        // 初期表示で転倒側セクションを非表示
         document.getElementById('fallSection').style.display = 'none';
 
         // マーカーラベル用スタイル
@@ -884,15 +937,15 @@
                 box-shadow: none !important;
                 color: #fff !important;
                 font-weight: bold !important;
-                font-size: 11px !important;
+                font-size: 12px !important;
             }
             .distance-label {
-                background: rgba(0,0,0,0.7);
+                background: rgba(0,0,0,0.8);
                 border: none;
                 border-radius: 4px;
-                padding: 2px 5px;
+                padding: 2px 6px;
                 color: #fff;
-                font-size: 10px;
+                font-size: 11px;
                 font-weight: bold;
                 text-align: center;
             }
