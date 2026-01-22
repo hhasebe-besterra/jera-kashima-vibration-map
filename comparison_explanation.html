@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>振動解析結果の妥当性評価について</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #eee;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #94d2bd;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        h1 {
+            font-size: 28px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        .section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border-left: 4px solid #667eea;
+        }
+        .section h2 {
+            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section h2::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+        .section p {
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+        .section ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        .section li {
+            line-height: 1.8;
+            color: #bbb;
+            margin-bottom: 6px;
+        }
+        .highlight-box {
+            background: rgba(102, 126, 234, 0.15);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .highlight-box h3 {
+            font-size: 15px;
+            color: #94d2bd;
+            margin-bottom: 12px;
+        }
+        .criteria-list {
+            display: grid;
+            gap: 10px;
+        }
+        .criteria-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+        }
+        .criteria-badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+        .badge-good { background: #00d4aa; color: #000; }
+        .badge-ok { background: #ffa502; color: #000; }
+        .badge-check { background: #e94560; color: #fff; }
+
+        /* 比較テーブル */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .comparison-table th,
+        .comparison-table td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        .comparison-table th {
+            background: rgba(102, 126, 234, 0.3);
+            color: #fff;
+            font-weight: bold;
+        }
+        .comparison-table tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .result-good {
+            color: #00d4aa;
+            font-weight: bold;
+        }
+        .result-ok {
+            color: #ffa502;
+            font-weight: bold;
+        }
+
+        /* 結論セクション */
+        .conclusion {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+        .conclusion h2 {
+            color: #fff;
+            margin-bottom: 16px;
+        }
+        .conclusion p {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #ddd;
+        }
+        .conclusion strong {
+            color: #00d4aa;
+        }
+
+        /* 参考文献 */
+        .reference {
+            margin-top: 30px;
+            padding: 16px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: #888;
+        }
+        .reference strong {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="kashima_vibration_comparison.html" class="back-link">← 比較マップに戻る</a>
+
+        <h1>振動解析結果の妥当性評価について</h1>
+
+        <div class="section">
+            <h2>評価の基本原則</h2>
+            <p>異なる解析手法・条件による結果を比較する場合、<strong style="color:#ffa502">「同一オーダー（桁）に収まるか」</strong>が工学的な妥当性判断の第一基準となる。</p>
+        </div>
+
+        <div class="section">
+            <h2>根拠1：地盤振動予測の本質的不確かさ</h2>
+            <p>地盤振動予測では、土木学会・ISVR等の研究により、以下の不確かさ要因が知られている：</p>
+            <ul>
+                <li>地盤物性値（S波速度、減衰定数）：±20〜50%のばらつき</li>
+                <li>境界条件設定の違い</li>
+                <li>メッシュ分割・要素選択の影響</li>
+                <li>入力波形のモデル化差異</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>根拠2：国際的な予測不確かさの知見</h2>
+            <p>鉄道振動予測の研究（Weber et al., 2018）では、地盤伝播経路の標準不確かさは<strong style="color:#ffa502">約3.9dB（約1.6倍に相当）</strong>と報告。情報が限定的な場合、10dB（約3倍）の安全率を設定する事例も存在する。</p>
+        </div>
+
+        <div class="section">
+            <h2>根拠3：V&V（検証・妥当性確認）の観点</h2>
+            <p>日本計算工学会HQC標準では、独立した解析チームによるクロスチェック解析において、結果が同一オーダーで一致することを妥当性確認の一手法として推奨。</p>
+        </div>
+
+        <div class="highlight-box">
+            <h3>定量的判断基準</h3>
+            <div class="criteria-list">
+                <div class="criteria-item">
+                    <span class="criteria-badge badge-good">良好な一致</span>
+                    <span>比率 0.5〜2倍（±6dB以内）</span>
+                </div>
+                <div class="criteria-item">
+                    <span class="criteria-badge badge-ok">同一オーダー</span>
+                    <span>比率 0.3〜3倍（±10dB以内）― 工学的に許容</span>
+                </div>
+                <div class="criteria-item">
+                    <span class="criteria-badge badge-check">要因検討必要</span>
+                    <span>比率 0.1〜10倍（±20dB以内）― オーダーは一致</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>解析結果比較（加速度 m/s²）</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>測定地点</th>
+                        <th>計算力学</th>
+                        <th>BOS</th>
+                        <th>比率</th>
+                        <th>dB差</th>
+                        <th>判定</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>タービン側 100m</td>
+                        <td>0.972</td>
+                        <td>0.42</td>
+                        <td>2.3倍</td>
+                        <td>7.3 dB</td>
+                        <td class="result-ok">同オーダー</td>
+                    </tr>
+                    <tr>
+                        <td>タービン側 200m</td>
+                        <td>0.357</td>
+                        <td>0.21</td>
+                        <td>1.7倍</td>
+                        <td>4.6 dB</td>
+                        <td class="result-ok">同オーダー</td>
+                    </tr>
+                    <tr>
+                        <td>道路側 100m</td>
+                        <td>2.11</td>
+                        <td>1.97</td>
+                        <td>1.07倍</td>
+                        <td>0.6 dB</td>
+                        <td class="result-good">良好一致</td>
+                    </tr>
+                    <tr>
+                        <td>道路側 200m</td>
+                        <td>0.516</td>
+                        <td>0.46</td>
+                        <td>1.12倍</td>
+                        <td>1.0 dB</td>
+                        <td class="result-good">良好一致</td>
+                    </tr>
+                    <tr>
+                        <td>道路側 300m</td>
+                        <td>0.374</td>
+                        <td>0.42</td>
+                        <td>0.89倍</td>
+                        <td>-1.0 dB</td>
+                        <td class="result-good">良好一致</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="conclusion">
+            <h2>結論</h2>
+            <p>両社の解析結果は<strong>比率0.89〜2.3倍（-1.0〜+7.3dB）</strong>の範囲であり、地盤振動予測における本質的不確かさ（標準不確かさ約4dB）を考慮すると、<strong>同一オーダーで整合</strong>しており、独立した解析として<strong>相互に妥当性を裏付けている</strong>。</p>
+        </div>
+
+        <div class="reference">
+            <strong>参考文献：</strong><br>
+            Weber et al.(2018) Rail Ground-Borne Noise and Vibration Prediction Uncertainties, Springer<br>
+            日本計算工学会 HQC標準(2011)
+        </div>
+    </div>
+</body>
+</html>
