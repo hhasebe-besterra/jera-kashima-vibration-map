@@ -380,13 +380,13 @@
 
             <!-- 会社切替 -->
             <div class="company-toggle">
-                <button class="company-btn bos-btn active" id="bosBtn" onclick="setCompany('bos')">
+                <button class="company-btn bos-btn" id="bosBtn" onclick="setCompany('bos')">
                     BOS (B)<br><small>実測値</small>
                 </button>
                 <button class="company-btn cmrc-btn" id="cmrcBtn" onclick="setCompany('cmrc')">
                     計算力学 (R)<br><small>解析値</small>
                 </button>
-                <button class="company-btn both-btn" id="bothBtn" onclick="setCompany('both')">
+                <button class="company-btn both-btn active" id="bothBtn" onclick="setCompany('both')">
                     両方比較<br><small>並列表示</small>
                 </button>
             </div>
@@ -400,7 +400,7 @@
 
             <!-- dB表示切替 -->
             <div class="db-toggle">
-                <button class="db-btn active" id="dbBtn" onclick="toggleDb()">dB列を表示</button>
+                <button class="db-btn" id="dbBtn" onclick="toggleDb()">dB列を非表示</button>
             </div>
 
             <!-- 凡例 -->
@@ -441,7 +441,7 @@
             <!-- 後方（タービン側）-->
             <div class="data-section" id="backwardSection">
                 <h3>後方（タービン側）</h3>
-                <table id="backwardTable">
+                <table id="backwardTable" class="db-hidden">
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
@@ -471,7 +471,7 @@
             <!-- 横方向（道路側）-->
             <div class="data-section" id="lateralSection">
                 <h3>横方向（道路側）</h3>
-                <table id="lateralTable">
+                <table id="lateralTable" class="db-hidden">
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
@@ -526,9 +526,9 @@
         let centerLat = 35.917924;
         let centerLng = 140.698911;
         let currentRotation = 153;
-        let currentCompany = 'bos';
+        let currentCompany = 'both';
         let currentDirection = 'all';
-        let showDb = true;
+        let showDb = false;
 
         // BOSデータ
         const bosData = {
