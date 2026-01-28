@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JERA鹿島火力発電所 振動解析比較マップ - BOS vs 計算力学</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        #map {
+            flex: 1;
+            min-width: 45%;
+            position: relative;
+        }
+        .sidebar {
+            width: 520px;
+            background: #16213e;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 3px solid #e94560;
+        }
+        h1 {
+            font-size: 18px;
+            color: #e94560;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        /* 会社切替ボタン */
+        .company-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .company-btn {
+            flex: 1;
+            padding: 14px 10px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .company-btn.active {
+            color: #fff;
+        }
+        .company-btn.bos-btn.active {
+            border-color: #e94560;
+            background: rgba(233, 69, 96, 0.2);
+        }
+        .company-btn.cmrc-btn.active {
+            border-color: #00d4aa;
+            background: rgba(0, 212, 170, 0.2);
+        }
+        .company-btn.both-btn.active {
+            border-color: #ffa502;
+            background: rgba(255, 165, 2, 0.2);
+        }
+
+        /* 方向切替 */
+        .direction-toggle {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .direction-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .direction-btn.active {
+            border-color: #94d2bd;
+            color: #fff;
+            background: rgba(148, 210, 189, 0.2);
+        }
+
+        /* dB表示切替ボタン */
+        .db-toggle {
+            margin-bottom: 15px;
+        }
+        .db-btn {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #333;
+            background: #1a1a2e;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .db-btn.active {
+            border-color: #9b59b6;
+            color: #fff;
+            background: rgba(155, 89, 182, 0.2);
+        }
+
+        /* 凡例 */
+        .legend {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .legend h3 {
+            font-size: 14px;
+            color: #94d2bd;
+            margin-bottom: 10px;
+        }
+        .legend-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        .legend-marker {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .legend-marker.bos-back { background: #e94560; }
+        .legend-marker.bos-lat { background: #4a90e2; }
+        .legend-marker.cmrc-back { background: #ff9500; }
+        .legend-marker.cmrc-lat { background: #00d4aa; }
+
+        /* 回転コントロール */
+        .rotation-control {
+            background: #1a1a2e;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+        .rotation-control h3 {
+            font-size: 13px;
+            color: #ffa502;
+            margin-bottom: 8px;
+        }
+        .rotation-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .rotation-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffa502;
+            min-width: 50px;
+        }
+        .rotation-slider {
+            flex: 1;
+            height: 8px;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #e94560, #ffa502, #94d2bd, #4a90e2, #e94560);
+            border-radius: 4px;
+            outline: none;
+        }
+        .rotation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,165,2,0.5);
+        }
+
+        /* セクションタイトル */
+        h2 {
+            font-size: 16px;
+            color: #94d2bd;
+            margin: 20px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #333;
+        }
+
+        /* データテーブル */
+        .data-section {
+            margin-bottom: 20px;
+        }
+        .data-section h3 {
+            font-size: 14px;
+            color: #ffa502;
+            margin-bottom: 8px;
+            padding-left: 5px;
+            border-left: 3px solid #ffa502;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 10px 6px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            background: #1a1a2e;
+            color: #94d2bd;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .bos-header {
+            background: rgba(233, 69, 96, 0.3);
+            color: #e94560;
+        }
+        .cmrc-header {
+            background: rgba(0, 212, 170, 0.3);
+            color: #00d4aa;
+        }
+        td {
+            font-weight: 600;
+        }
+        .marker-cell {
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .marker-cell.bos { color: #e94560; }
+        .marker-cell.cmrc { color: #00d4aa; }
+        .bos-cell {
+            color: #ff6b6b;
+        }
+        .cmrc-cell {
+            color: #4ecdc4;
+        }
+        .na-cell {
+            color: #666;
+        }
+        .db-column {
+            transition: opacity 0.3s;
+        }
+        .db-hidden .db-column {
+            display: none;
+        }
+
+        /* 説明資料リンク */
+        .explanation-link {
+            margin: 20px 0;
+        }
+        .explanation-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .explanation-btn:hover {
+            background: linear-gradient(135deg, #764ba2, #667eea);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        /* 換算表 */
+        .conversion-table {
+            background: rgba(148, 210, 189, 0.1);
+            border: 2px solid #94d2bd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .conversion-table h3 {
+            font-size: 15px;
+            color: #94d2bd;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .conversion-table table {
+            margin-bottom: 12px;
+            background: transparent;
+        }
+        .conversion-table th {
+            background: rgba(148, 210, 189, 0.2);
+        }
+        .formula {
+            text-align: center;
+            font-size: 16px;
+            color: #ffa502;
+            font-weight: bold;
+            padding: 10px;
+            background: rgba(255, 165, 2, 0.1);
+            border-radius: 6px;
+        }
+
+        /* 操作説明 */
+        .info-box {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(22, 33, 62, 0.95);
+            border: 2px solid #ffa502;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 11px;
+            line-height: 1.6;
+            z-index: 1000;
+            max-width: 240px;
+        }
+        .info-box strong {
+            color: #ffa502;
+            font-size: 12px;
+        }
+
+        /* マーカースタイル */
+        .center-marker {
+            background: #e94560;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(233,69,96,0.8);
+        }
+        .chimney-label {
+            background: rgba(255, 149, 0, 0.9);
+            border: 2px solid #cc7000;
+            border-radius: 6px;
+            padding: 4px 10px;
+            color: #000;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* 注釈 */
+        .note {
+            font-size: 11px;
+            color: #888;
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="map">
+            <div class="info-box">
+                <strong>BOS vs 計算力学 比較マップ</strong><br>
+                ・B = BOS, R = 計算力学<br>
+                ・会社ボタンで表示切替<br>
+                ・マーカークリックで詳細<br>
+                ・回転スライダーで方向調整
+            </div>
+        </div>
+        <div class="sidebar">
+            <h1>JERA鹿島火力発電所 振動解析比較</h1>
+            <div class="subtitle">5・6号機煙突転倒時 BOS vs 計算力学研究センター</div>
+
+            <!-- 会社切替 -->
+            <div class="company-toggle">
+                <button class="company-btn bos-btn" id="bosBtn" onclick="setCompany('bos')">
+                    BOS (B)<br><small>実測値</small>
+                </button>
+                <button class="company-btn cmrc-btn" id="cmrcBtn" onclick="setCompany('cmrc')">
+                    計算力学 (R)<br><small>解析値</small>
+                </button>
+                <button class="company-btn both-btn active" id="bothBtn" onclick="setCompany('both')">
+                    両方比較<br><small>並列表示</small>
+                </button>
+            </div>
+
+            <!-- 方向切替 -->
+            <div class="direction-toggle">
+                <button class="direction-btn active" id="allDirBtn" onclick="setDirection('all')">全方向</button>
+                <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方(タービン側)</button>
+                <button class="direction-btn" id="lateralDirBtn" onclick="setDirection('lateral')">横方向(道路側)</button>
+            </div>
+
+            <!-- dB表示切替 -->
+            <div class="db-toggle">
+                <button class="db-btn" id="dbBtn" onclick="toggleDb()">dB列を非表示</button>
+            </div>
+
+            <!-- 凡例 -->
+            <div class="legend">
+                <h3>凡例</h3>
+                <div class="legend-grid">
+                    <div class="legend-item">
+                        <div class="legend-marker bos-back">B1</div>
+                        <span>BOS後方</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker bos-lat">B7</div>
+                        <span>BOS横方向</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker cmrc-back">R1</div>
+                        <span>計算力学後方</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker cmrc-lat">R3</div>
+                        <span>計算力学横方向</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 回転コントロール -->
+            <div class="rotation-control">
+                <h3>全体回転</h3>
+                <div class="rotation-row">
+                    <div class="rotation-value" id="rotationValue">153°</div>
+                    <input type="range" class="rotation-slider" id="rotationSlider" min="0" max="360" value="153">
+                </div>
+            </div>
+
+            <!-- 解析結果テーブル -->
+            <h2>解析結果一覧</h2>
+
+            <!-- 後方（タービン側）-->
+            <div class="data-section" id="backwardSection">
+                <h3>後方（タービン側）</h3>
+                <table id="backwardTable" class="db-hidden">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">距離</th>
+                            <th colspan="3" class="bos-header">BOS (B)</th>
+                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">No.</th>
+                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">No.</th>
+                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header db-column">dB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>20m</td><td class="marker-cell bos">B1</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>50m</td><td class="marker-cell bos">B2</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B3</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R1</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell db-column">86</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B4</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">R2</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell db-column">75</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B5</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B6</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 横方向（道路側）-->
+            <div class="data-section" id="lateralSection">
+                <h3>横方向（道路側）</h3>
+                <table id="lateralTable" class="db-hidden">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">距離</th>
+                            <th colspan="3" class="bos-header">BOS (B)</th>
+                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">No.</th>
+                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">No.</th>
+                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header db-column">dB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>50m</td><td class="marker-cell bos">B7</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B8</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">R3</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell db-column">92</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B9</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">R4</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell db-column">83</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B10</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R5</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell db-column">80</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 解析結果の差異説明リンク -->
+            <div class="explanation-link">
+                <a href="comparison_explanation.html" target="_blank" class="explanation-btn">
+                    解析結果の差異についての説明資料
+                </a>
+            </div>
+
+            <!-- 換算表 -->
+            <div class="conversion-table">
+                <h3>加速度・dB・震度 換算表</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>加速度 [m/s²]</th>
+                            <th>dB</th>
+                            <th>震度（目安）</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.001</td><td>60</td><td>0</td></tr>
+                        <tr><td>0.01</td><td>80</td><td>1</td></tr>
+                        <tr><td>0.1</td><td>100</td><td>2〜3</td></tr>
+                        <tr><td>1</td><td>120</td><td>3〜4</td></tr>
+                        <tr><td>10</td><td>140</td><td>5強〜6弱</td></tr>
+                    </tbody>
+                </table>
+                <div class="formula">1 m/s² = 120 dB</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== 初期設定 ==========
+        let centerLat = 35.917924;
+        let centerLng = 140.698911;
+        let currentRotation = 153;
+        let currentCompany = 'both';
+        let currentDirection = 'all';
+        let showDb = false;
+
+        // BOSデータ
+        const bosData = {
+            backward: [
+                { id: 'B1', dist: 20, acc: 1.14, db: 121.2 },
+                { id: 'B2', dist: 50, acc: 0.85, db: 118.6 },
+                { id: 'B3', dist: 100, acc: 0.42, db: 112.4 },
+                { id: 'B4', dist: 200, acc: 0.21, db: 106.3 },
+                { id: 'B5', dist: 300, acc: 0.10, db: 100.1 },
+                { id: 'B6', dist: 400, acc: 0.07, db: 96.4 }
+            ],
+            lateral: [
+                { id: 'B7', dist: 50, acc: 2.78, db: 128.9 },
+                { id: 'B8', dist: 100, acc: 1.97, db: 125.9 },
+                { id: 'B9', dist: 200, acc: 0.46, db: 113.3 },
+                { id: 'B10', dist: 300, acc: 0.42, db: 112.4 },
+                { id: 'B11', dist: 400, acc: 0.22, db: 106.8 }
+            ]
+        };
+
+        // 計算力学データ
+        const cmrcData = {
+            backward: [
+                { id: 'R1', dist: 100, acc: 0.972, db: 86 },
+                { id: 'R2', dist: 200, acc: 0.357, db: 75 }
+            ],
+            lateral: [
+                { id: 'R3', dist: 100, acc: 2.11, db: 92 },
+                { id: 'R4', dist: 200, acc: 0.516, db: 83 },
+                { id: 'R5', dist: 300, acc: 0.374, db: 80 }
+            ]
+        };
+
+        // ========== マップ初期化 ==========
+        const map = L.map('map', {
+            center: [centerLat, centerLng],
+            zoom: 16,
+            zoomControl: true
+        });
+
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: '© Esri'
+        });
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        });
+        satelliteLayer.addTo(map);
+        L.control.layers({ "航空写真": satelliteLayer, "地図": osmLayer }).addTo(map);
+
+        const bosLayer = L.layerGroup().addTo(map);
+        const cmrcLayer = L.layerGroup();
+        const circlesLayer = L.layerGroup().addTo(map);
+        const linesLayer = L.layerGroup().addTo(map);
+        let centerMarker;
+
+        // ========== 座標計算 ==========
+        function offsetLatLng(lat, lng, distanceMeters, bearingDegrees) {
+            const R = 6371000;
+            const bearing = bearingDegrees * Math.PI / 180;
+            const lat1 = lat * Math.PI / 180;
+            const lng1 = lng * Math.PI / 180;
+
+            const lat2 = Math.asin(
+                Math.sin(lat1) * Math.cos(distanceMeters / R) +
+                Math.cos(lat1) * Math.sin(distanceMeters / R) * Math.cos(bearing)
+            );
+            const lng2 = lng1 + Math.atan2(
+                Math.sin(bearing) * Math.sin(distanceMeters / R) * Math.cos(lat1),
+                Math.cos(distanceMeters / R) - Math.sin(lat1) * Math.sin(lat2)
+            );
+
+            return [lat2 * 180 / Math.PI, lng2 * 180 / Math.PI];
+        }
+
+        // ========== 中心マーカー ==========
+        function createCenterMarker() {
+            const icon = L.divIcon({
+                className: 'center-marker',
+                iconSize: [26, 26],
+                iconAnchor: [13, 13]
+            });
+
+            centerMarker = L.marker([centerLat, centerLng], {
+                icon: icon,
+                zIndexOffset: 1000
+            }).addTo(map);
+
+            centerMarker.bindPopup('<b>煙突位置（中心）</b>');
+        }
+
+        // ========== マーカー作成 ==========
+        function createMarkers() {
+            bosLayer.clearLayers();
+            cmrcLayer.clearLayers();
+
+            const showBackward = currentDirection === 'all' || currentDirection === 'backward';
+            const showLateral = currentDirection === 'all' || currentDirection === 'lateral';
+
+            // BOS 後方
+            if (showBackward) {
+                bosData.backward.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 90) : basePos;
+
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
+                        fillColor: '#e94560',
+                        color: '#fff',
+                        weight: 3,
+                        fillOpacity: 0.9
+                    });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#e94560">BOS ${point.id} 後方 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
+                    `);
+                    bosLayer.addLayer(marker);
+                });
+            }
+
+            // BOS 横方向
+            if (showLateral) {
+                bosData.lateral.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation) : basePos;
+
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
+                        fillColor: '#4a90e2',
+                        color: '#fff',
+                        weight: 3,
+                        fillOpacity: 0.9
+                    });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#4a90e2">BOS ${point.id} 横方向 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
+                    `);
+                    bosLayer.addLayer(marker);
+                });
+            }
+
+            // 計算力学 後方
+            if (showBackward) {
+                cmrcData.backward.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation - 90) : basePos;
+
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
+                        fillColor: '#ff9500',
+                        color: '#fff',
+                        weight: 3,
+                        fillOpacity: 0.9
+                    });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#ff9500">計算力学 ${point.id} 後方 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
+                    `);
+                    cmrcLayer.addLayer(marker);
+                });
+            }
+
+            // 計算力学 横方向
+            if (showLateral) {
+                cmrcData.lateral.forEach(point => {
+                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
+                    const pos = currentCompany === 'both' ?
+                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 180) : basePos;
+
+                    const marker = L.circleMarker(pos, {
+                        radius: 16,
+                        fillColor: '#00d4aa',
+                        color: '#fff',
+                        weight: 3,
+                        fillOpacity: 0.9
+                    });
+                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
+                    marker.bindPopup(`
+                        <b style="color:#00d4aa">計算力学 ${point.id} 横方向 ${point.dist}m</b><br>
+                        加速度: <b>${point.acc} m/s²</b><br>
+                        振動レベル: <b>${point.db} dB</b>
+                    `);
+                    cmrcLayer.addLayer(marker);
+                });
+            }
+
+            updateLayerVisibility();
+        }
+
+        // ========== 同心円・接続線 ==========
+        function updateCircles() {
+            circlesLayer.clearLayers();
+            const distances = [50, 100, 200, 300, 400];
+            const colors = ['#ff6b6b', '#ffa502', '#94d2bd', '#4a90e2', '#9b59b6'];
+
+            distances.forEach((dist, i) => {
+                const circlePoints = [];
+                for (let angle = 0; angle <= 360; angle += 3) {
+                    circlePoints.push(offsetLatLng(centerLat, centerLng, dist, angle));
+                }
+
+                L.polyline(circlePoints, {
+                    color: colors[i],
+                    weight: 4,
+                    opacity: 0.9,
+                    dashArray: '10, 6'
+                }).addTo(circlesLayer);
+
+                const labelPos = offsetLatLng(centerLat, centerLng, dist, currentRotation - 45);
+                L.marker(labelPos, {
+                    icon: L.divIcon({
+                        className: 'distance-label',
+                        html: `${dist}m`,
+                        iconSize: [36, 14],
+                        iconAnchor: [18, 7]
+                    })
+                }).addTo(circlesLayer);
+            });
+        }
+
+        function updateLines() {
+            linesLayer.clearLayers();
+
+            // 後方接続線
+            const backwardEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation);
+            L.polyline([[centerLat, centerLng], backwardEnd], {
+                color: '#e94560',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
+            }).addTo(linesLayer);
+
+            // 横方向接続線
+            const lateralEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation + 90);
+            L.polyline([[centerLat, centerLng], lateralEnd], {
+                color: '#4a90e2',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
+            }).addTo(linesLayer);
+
+            // 煙突転倒表示
+            const fallDirection = currentRotation + 180;
+            const tipPos = offsetLatLng(centerLat, centerLng, 230, fallDirection);
+
+            L.polyline([[centerLat, centerLng], tipPos], {
+                color: '#ff9500',
+                weight: 12,
+                opacity: 0.8,
+                lineCap: 'round'
+            }).addTo(linesLayer);
+
+            const labelPos = offsetLatLng(centerLat, centerLng, 115, fallDirection);
+            L.marker(labelPos, {
+                icon: L.divIcon({
+                    className: 'chimney-label',
+                    html: '煙突転倒方向(230m)',
+                    iconSize: [130, 24],
+                    iconAnchor: [65, 12]
+                })
+            }).addTo(linesLayer);
+        }
+
+        // ========== レイヤー表示制御 ==========
+        function updateLayerVisibility() {
+            if (currentCompany === 'bos') {
+                map.addLayer(bosLayer);
+                map.removeLayer(cmrcLayer);
+            } else if (currentCompany === 'cmrc') {
+                map.removeLayer(bosLayer);
+                map.addLayer(cmrcLayer);
+            } else {
+                map.addLayer(bosLayer);
+                map.addLayer(cmrcLayer);
+            }
+        }
+
+        // ========== 会社切替 ==========
+        function setCompany(company) {
+            currentCompany = company;
+
+            document.getElementById('bosBtn').classList.toggle('active', company === 'bos');
+            document.getElementById('cmrcBtn').classList.toggle('active', company === 'cmrc');
+            document.getElementById('bothBtn').classList.toggle('active', company === 'both');
+
+            createMarkers();
+        }
+
+        // ========== 方向切替 ==========
+        function setDirection(direction) {
+            currentDirection = direction;
+
+            document.getElementById('allDirBtn').classList.toggle('active', direction === 'all');
+            document.getElementById('backwardDirBtn').classList.toggle('active', direction === 'backward');
+            document.getElementById('lateralDirBtn').classList.toggle('active', direction === 'lateral');
+
+            document.getElementById('backwardSection').style.display =
+                (direction === 'all' || direction === 'backward') ? 'block' : 'none';
+            document.getElementById('lateralSection').style.display =
+                (direction === 'all' || direction === 'lateral') ? 'block' : 'none';
+
+            createMarkers();
+        }
+
+        // ========== dB表示切替 ==========
+        function toggleDb() {
+            showDb = !showDb;
+            document.getElementById('dbBtn').classList.toggle('active', showDb);
+            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示' : 'dB列を非表示';
+
+            const tables = ['backwardTable', 'lateralTable'];
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                if (table) {
+                    table.classList.toggle('db-hidden', !showDb);
+                }
+            });
+        }
+
+        // ========== 回転スライダー ==========
+        document.getElementById('rotationSlider').addEventListener('input', function(e) {
+            currentRotation = parseInt(e.target.value);
+            document.getElementById('rotationValue').textContent = currentRotation + '°';
+            createMarkers();
+            updateCircles();
+            updateLines();
+        });
+
+        // ========== 初期化 ==========
+        createCenterMarker();
+        createMarkers();
+        updateCircles();
+        updateLines();
+
+        // マーカーラベル用スタイル
+        const style = document.createElement('style');
+        style.textContent = `
+            .marker-label {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                color: #fff !important;
+                font-weight: bold !important;
+                font-size: 12px !important;
+            }
+            .distance-label {
+                background: rgba(0,0,0,0.8);
+                border: none;
+                border-radius: 4px;
+                padding: 2px 6px;
+                color: #fff;
+                font-size: 11px;
+                font-weight: bold;
+                text-align: center;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
