@@ -174,6 +174,53 @@
         .reference strong {
             color: #aaa;
         }
+
+        /* 換算表 */
+        .conversion-table-section {
+            background: rgba(148, 210, 189, 0.1);
+            border: 2px solid #94d2bd;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 30px;
+        }
+        .conversion-table-section h2 {
+            font-size: 18px;
+            color: #94d2bd;
+            margin-bottom: 16px;
+            border: none;
+        }
+        .conversion-table-section h2::before {
+            background: #94d2bd;
+        }
+        .conversion-table-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        .conversion-table-section th,
+        .conversion-table-section td {
+            padding: 12px 10px;
+            text-align: center;
+            border-bottom: 1px solid #333;
+        }
+        .conversion-table-section th {
+            background: rgba(148, 210, 189, 0.2);
+            color: #94d2bd;
+            font-weight: bold;
+        }
+        .conversion-table-section tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .formula {
+            text-align: center;
+            font-size: 18px;
+            color: #ffa502;
+            font-weight: bold;
+            padding: 12px;
+            background: rgba(255, 165, 2, 0.1);
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -287,6 +334,27 @@
         <div class="conclusion">
             <h2>結論</h2>
             <p>両社の解析結果は<strong>比率0.89〜2.3倍（-1.0〜+7.3dB）</strong>の範囲であり、地盤振動予測における本質的不確かさ（標準不確かさ約4dB）を考慮すると、<strong>同一オーダーで整合</strong>しており、独立した解析として<strong>相互に妥当性を裏付けている</strong>。</p>
+        </div>
+
+        <div class="conversion-table-section">
+            <h2>加速度・dB・震度 換算表</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>加速度 [m/s²]</th>
+                        <th>dB</th>
+                        <th>震度（目安）</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>0.001</td><td>60</td><td>0</td></tr>
+                    <tr><td>0.01</td><td>80</td><td>1</td></tr>
+                    <tr><td>0.1</td><td>100</td><td>2〜3</td></tr>
+                    <tr><td>1</td><td>120</td><td>3〜4</td></tr>
+                    <tr><td>10</td><td>140</td><td>5強〜6弱</td></tr>
+                </tbody>
+            </table>
+            <div class="formula">1 m/s² = 120 dB</div>
         </div>
 
         <div class="reference">
