@@ -221,6 +221,82 @@
             background: rgba(255, 165, 2, 0.1);
             border-radius: 8px;
         }
+
+        /* 論理的根拠セクション */
+        .rationale-section {
+            background: rgba(255, 165, 2, 0.08);
+            border: 2px solid rgba(255, 165, 2, 0.4);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+        .rationale-section h3 {
+            font-size: 16px;
+            color: #ffa502;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .rationale-section h3::before {
+            content: '📐';
+        }
+        .rationale-section h4 {
+            font-size: 14px;
+            color: #94d2bd;
+            margin: 16px 0 10px;
+            padding-left: 10px;
+            border-left: 3px solid #94d2bd;
+        }
+        .rationale-section p {
+            line-height: 1.8;
+            color: #ccc;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .rationale-section .formula-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 12px 0;
+            text-align: center;
+        }
+        .rationale-section .formula-main {
+            font-size: 20px;
+            color: #fff;
+            font-family: 'Times New Roman', serif;
+            margin-bottom: 8px;
+        }
+        .rationale-section .formula-desc {
+            font-size: 12px;
+            color: #888;
+        }
+        .rationale-section .example-calc {
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 10px 0;
+            font-size: 13px;
+            color: #94d2bd;
+        }
+        .rationale-section ul {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        .rationale-section li {
+            line-height: 1.8;
+            color: #bbb;
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+        .rationale-section .note-box {
+            background: rgba(102, 126, 234, 0.15);
+            border-left: 4px solid #667eea;
+            padding: 12px 16px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #aaa;
+        }
     </style>
 </head>
 <body>
@@ -355,6 +431,53 @@
                 </tbody>
             </table>
             <div class="formula">1 m/s² = 120 dB</div>
+
+            <div class="rationale-section">
+                <h3>換算表の論理的根拠</h3>
+
+                <h4>1. 振動レベル（dB）の定義</h4>
+                <p>振動レベルは、加速度を対数スケールで表現したものです。JIS C 1510（振動レベル計）に基づく定義：</p>
+                <div class="formula-box">
+                    <div class="formula-main">L = 20 × log₁₀(a / a₀)</div>
+                    <div class="formula-desc">L：振動レベル [dB]、a：加速度 [m/s²]、a₀：基準加速度</div>
+                </div>
+
+                <h4>2. 基準加速度の設定</h4>
+                <p>本換算表では、実務的に広く使用されている基準値を採用しています：</p>
+                <div class="formula-box">
+                    <div class="formula-main">a₀ = 10⁻⁶ m/s² = 1 μm/s²</div>
+                    <div class="formula-desc">人体が感知できる振動の最小レベルに基づく基準値</div>
+                </div>
+
+                <h4>3. 計算例</h4>
+                <div class="example-calc">
+                    <strong>例：加速度 1 m/s² の場合</strong><br>
+                    L = 20 × log₁₀(1 / 10⁻⁶) = 20 × log₁₀(10⁶) = 20 × 6 = <strong>120 dB</strong>
+                </div>
+                <div class="example-calc">
+                    <strong>例：加速度 0.1 m/s² の場合</strong><br>
+                    L = 20 × log₁₀(0.1 / 10⁻⁶) = 20 × log₁₀(10⁵) = 20 × 5 = <strong>100 dB</strong>
+                </div>
+                <p>加速度が10倍になるごとに、振動レベルは20dB増加します。</p>
+
+                <h4>4. 震度との対応関係</h4>
+                <p>気象庁の計測震度は以下の近似式で表されます：</p>
+                <div class="formula-box">
+                    <div class="formula-main">I ≈ 2 × log₁₀(a) + 0.94</div>
+                    <div class="formula-desc">I：計測震度、a：加速度 [gal = cm/s²]</div>
+                </div>
+                <p>ただし、実際の計測震度は周波数フィルタ処理等を含むため、上記は目安です。</p>
+                <ul>
+                    <li>震度1：約0.8〜2.5 gal（0.008〜0.025 m/s²）</li>
+                    <li>震度3：約8〜25 gal（0.08〜0.25 m/s²）</li>
+                    <li>震度5弱：約80〜140 gal（0.8〜1.4 m/s²）</li>
+                    <li>震度6弱：約250〜450 gal（2.5〜4.5 m/s²）</li>
+                </ul>
+
+                <div class="note-box">
+                    <strong>注意：</strong>本換算表は工学的な目安であり、実際の振動評価では周波数特性、継続時間、地盤条件等を総合的に考慮する必要があります。
+                </div>
+            </div>
         </div>
 
         <div class="reference">
