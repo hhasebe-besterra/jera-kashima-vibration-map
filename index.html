@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JERA鹿島火力発電所 振動解析比較マップ - BOS vs 計算力学</title>
+    <title>JERA鹿島火力発電所 振動解析比較マップ - BOS vs RCCM</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -393,8 +393,8 @@
     <div class="container">
         <div id="map">
             <div class="info-box">
-                <strong>BOS vs 計算力学 比較マップ</strong><br>
-                ・B = BOS, R = 計算力学<br>
+                <strong>BOS vs RCCM 比較マップ</strong><br>
+                ・B = BOS, R = RCCM<br>
                 ・会社ボタンで表示切替<br>
                 ・マーカークリックで詳細<br>
                 ・回転スライダーで方向調整
@@ -402,7 +402,7 @@
         </div>
         <div class="sidebar">
             <h1>JERA鹿島火力発電所 振動解析比較</h1>
-            <div class="subtitle">5・6号機煙突転倒時 BOS vs 計算力学研究センター</div>
+            <div class="subtitle">5・6号機煙突転倒時 BOS vs RCCM</div>
 
             <!-- 会社切替 -->
             <div class="company-toggle">
@@ -410,7 +410,7 @@
                     BOS (B)<br><small>実測値</small>
                 </button>
                 <button class="company-btn cmrc-btn" id="cmrcBtn" onclick="setCompany('cmrc')">
-                    計算力学 (R)<br><small>解析値</small>
+                    RCCM (R)<br><small>解析値</small>
                 </button>
                 <button class="company-btn both-btn active" id="bothBtn" onclick="setCompany('both')">
                     両方比較<br><small>並列表示</small>
@@ -443,11 +443,11 @@
                     </div>
                     <div class="legend-item">
                         <div class="legend-marker cmrc-back">R1</div>
-                        <span>計算力学後方</span>
+                        <span>RCCM後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-lat">R3</div>
-                        <span>計算力学横方向</span>
+                        <div class="legend-marker cmrc-lat">R5</div>
+                        <span>RCCM横方向</span>
                     </div>
                 </div>
             </div>
@@ -472,7 +472,7 @@
                         <tr>
                             <th rowspan="2">距離</th>
                             <th colspan="3" class="bos-header">BOS (B)</th>
-                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
+                            <th colspan="3" class="cmrc-header">RCCM (R)</th>
                         </tr>
                         <tr>
                             <th class="bos-header">No.</th>
@@ -486,10 +486,10 @@
                     <tbody>
                         <tr><td>20m</td><td class="marker-cell bos">B1</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
                         <tr><td>50m</td><td class="marker-cell bos">B2</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">B3</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R1</td><td class="cmrc-cell">0.972</td><td class="cmrc-cell db-column">86</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">B4</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">R2</td><td class="cmrc-cell">0.357</td><td class="cmrc-cell db-column">75</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">B5</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">B6</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B3</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R1</td><td class="cmrc-cell">0.697</td><td class="cmrc-cell db-column">116.9</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B4</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">R2</td><td class="cmrc-cell">0.194</td><td class="cmrc-cell db-column">105.8</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B5</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="marker-cell cmrc">R3</td><td class="cmrc-cell">0.195</td><td class="cmrc-cell db-column">105.8</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B6</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="marker-cell cmrc">R4</td><td class="cmrc-cell">0.129</td><td class="cmrc-cell db-column">102.2</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -502,7 +502,7 @@
                         <tr>
                             <th rowspan="2">距離</th>
                             <th colspan="3" class="bos-header">BOS (B)</th>
-                            <th colspan="3" class="cmrc-header">計算力学 (R)</th>
+                            <th colspan="3" class="cmrc-header">RCCM (R)</th>
                         </tr>
                         <tr>
                             <th class="bos-header">No.</th>
@@ -515,10 +515,10 @@
                     </thead>
                     <tbody>
                         <tr><td>50m</td><td class="marker-cell bos">B7</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">B8</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">R3</td><td class="cmrc-cell">2.11</td><td class="cmrc-cell db-column">92</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">B9</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">R4</td><td class="cmrc-cell">0.516</td><td class="cmrc-cell db-column">83</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">B10</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R5</td><td class="cmrc-cell">0.374</td><td class="cmrc-cell db-column">80</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
+                        <tr><td>100m</td><td class="marker-cell bos">B8</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">R5</td><td class="cmrc-cell">0.970</td><td class="cmrc-cell db-column">119.7</td></tr>
+                        <tr><td>200m</td><td class="marker-cell bos">B9</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">R6</td><td class="cmrc-cell">0.537</td><td class="cmrc-cell db-column">114.6</td></tr>
+                        <tr><td>300m</td><td class="marker-cell bos">B10</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R7</td><td class="cmrc-cell">0.353</td><td class="cmrc-cell db-column">111.0</td></tr>
+                        <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="marker-cell cmrc">R8</td><td class="cmrc-cell">0.400</td><td class="cmrc-cell db-column">112.0</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -582,16 +582,19 @@
             ]
         };
 
-        // 計算力学データ
+        // RCCMデータ
         const cmrcData = {
             backward: [
-                { id: 'R1', dist: 100, acc: 0.972, db: 86 },
-                { id: 'R2', dist: 200, acc: 0.357, db: 75 }
+                { id: 'R1', dist: 100, acc: 0.697, db: 116.9 },
+                { id: 'R2', dist: 200, acc: 0.194, db: 105.8 },
+                { id: 'R3', dist: 300, acc: 0.195, db: 105.8 },
+                { id: 'R4', dist: 400, acc: 0.129, db: 102.2 }
             ],
             lateral: [
-                { id: 'R3', dist: 100, acc: 2.11, db: 92 },
-                { id: 'R4', dist: 200, acc: 0.516, db: 83 },
-                { id: 'R5', dist: 300, acc: 0.374, db: 80 }
+                { id: 'R5', dist: 100, acc: 0.970, db: 119.7 },
+                { id: 'R6', dist: 200, acc: 0.537, db: 114.6 },
+                { id: 'R7', dist: 300, acc: 0.353, db: 111.0 },
+                { id: 'R8', dist: 400, acc: 0.400, db: 112.0 }
             ]
         };
 
@@ -708,7 +711,7 @@
                 });
             }
 
-            // 計算力学 後方
+            // RCCM 後方
             if (showBackward) {
                 cmrcData.backward.forEach(point => {
                     const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
@@ -724,7 +727,7 @@
                     });
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
-                        <b style="color:#ff9500">計算力学 ${point.id} 後方 ${point.dist}m</b><br>
+                        <b style="color:#ff9500">RCCM ${point.id} 後方 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
                         振動レベル: <b>${point.db} dB</b>
                     `);
@@ -732,7 +735,7 @@
                 });
             }
 
-            // 計算力学 横方向
+            // RCCM 横方向
             if (showLateral) {
                 cmrcData.lateral.forEach(point => {
                     const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
@@ -748,7 +751,7 @@
                     });
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
-                        <b style="color:#00d4aa">計算力学 ${point.id} 横方向 ${point.dist}m</b><br>
+                        <b style="color:#00d4aa">RCCM ${point.id} 横方向 ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
                         振動レベル: <b>${point.db} dB</b>
                     `);
