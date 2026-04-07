@@ -27,7 +27,7 @@
             position: relative;
         }
         .sidebar {
-            width: 520px;
+            width: 560px;
             background: #16213e;
             padding: 20px;
             overflow-y: auto;
@@ -82,18 +82,20 @@
         /* 方向切替 */
         .direction-toggle {
             display: flex;
-            gap: 6px;
+            gap: 5px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
         .direction-btn {
             flex: 1;
-            padding: 10px 8px;
+            min-width: 80px;
+            padding: 8px 6px;
             border: 2px solid #333;
             background: #1a1a2e;
             color: #888;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             text-align: center;
             transition: all 0.3s;
         }
@@ -139,31 +141,28 @@
         }
         .legend-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
         }
         .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
+            font-size: 11px;
         }
         .legend-marker {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             border: 2px solid #fff;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: bold;
             color: #fff;
+            flex-shrink: 0;
         }
-        .legend-marker.bos-back { background: #e94560; }
-        .legend-marker.bos-lat { background: #4a90e2; }
-        .legend-marker.cmrc-back { background: #ff9500; }
-        .legend-marker.cmrc-lat { background: #00d4aa; }
 
         /* 回転コントロール */
         .rotation-control {
@@ -229,14 +228,14 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
+            font-size: 12px;
             margin-bottom: 15px;
             background: rgba(0,0,0,0.2);
             border-radius: 6px;
             overflow: hidden;
         }
         th, td {
-            padding: 10px 6px;
+            padding: 8px 5px;
             text-align: center;
             border-bottom: 1px solid #333;
         }
@@ -244,7 +243,7 @@
             background: #1a1a2e;
             color: #94d2bd;
             font-weight: bold;
-            font-size: 11px;
+            font-size: 10px;
         }
         .bos-header {
             background: rgba(233, 69, 96, 0.3);
@@ -254,20 +253,26 @@
             background: rgba(0, 212, 170, 0.3);
             color: #00d4aa;
         }
+        .ratio-header {
+            background: rgba(255, 165, 2, 0.3);
+            color: #ffa502;
+        }
         td {
             font-weight: 600;
         }
-        .marker-cell {
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .marker-cell.bos { color: #e94560; }
-        .marker-cell.cmrc { color: #00d4aa; }
         .bos-cell {
             color: #ff6b6b;
         }
         .cmrc-cell {
             color: #4ecdc4;
+        }
+        .ratio-cell {
+            color: #ffa502;
+            font-weight: bold;
+        }
+        .ratio-high {
+            color: #ff4757;
+            font-weight: bold;
         }
         .na-cell {
             color: #666;
@@ -303,6 +308,15 @@
             background: linear-gradient(135deg, #764ba2, #667eea);
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+        .contour-btn {
+            background: linear-gradient(135deg, #e94560, #ff6348);
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.4);
+            margin-top: 8px;
+        }
+        .contour-btn:hover {
+            background: linear-gradient(135deg, #ff6348, #e94560);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.6);
         }
 
         /* 換算表 */
@@ -377,8 +391,6 @@
             text-align: center;
             white-space: nowrap;
         }
-
-        /* 注釈 */
         .note {
             font-size: 11px;
             color: #888;
@@ -386,6 +398,20 @@
             padding: 8px;
             background: rgba(0,0,0,0.2);
             border-radius: 4px;
+        }
+
+        /* 測定パターン説明 */
+        .pattern-info {
+            background: rgba(255, 165, 2, 0.1);
+            border: 1px solid #ffa502;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+        .pattern-info strong {
+            color: #ffa502;
         }
     </style>
 </head>
@@ -397,12 +423,13 @@
                 ・B = BOS, R = RCCM<br>
                 ・会社ボタンで表示切替<br>
                 ・マーカークリックで詳細<br>
-                ・回転スライダーで方向調整
+                ・回転スライダーで方向調整<br>
+                ・4方向の測定パターン対応
             </div>
         </div>
         <div class="sidebar">
             <h1>JERA鹿島火力発電所 振動解析比較</h1>
-            <div class="subtitle">5・6号機煙突転倒時 BOS vs RCCM</div>
+            <div class="subtitle">5・6号機煙突転倒時 BOS vs RCCM（4方向測定パターン）</div>
 
             <!-- 会社切替 -->
             <div class="company-toggle">
@@ -420,8 +447,10 @@
             <!-- 方向切替 -->
             <div class="direction-toggle">
                 <button class="direction-btn active" id="allDirBtn" onclick="setDirection('all')">全方向</button>
-                <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方(タービン側)</button>
-                <button class="direction-btn" id="lateralDirBtn" onclick="setDirection('lateral')">横方向(道路側)</button>
+                <button class="direction-btn" id="backwardDirBtn" onclick="setDirection('backward')">後方<br><small>タービン側</small></button>
+                <button class="direction-btn" id="lat0DirBtn" onclick="setDirection('lateral_0m')">横_0m<br><small>公共道路側</small></button>
+                <button class="direction-btn" id="lat200DirBtn" onclick="setDirection('lateral_200m')">横_200m<br><small>転倒側220m</small></button>
+                <button class="direction-btn" id="lat222DirBtn" onclick="setDirection('lateral_222m')">横_222m<br><small>転倒側222m</small></button>
             </div>
 
             <!-- dB表示切替 -->
@@ -429,25 +458,50 @@
                 <button class="db-btn" id="dbBtn" onclick="toggleDb()">dB列を非表示</button>
             </div>
 
+            <!-- 測定パターン説明 -->
+            <div class="pattern-info">
+                <strong>測定パターン:</strong><br>
+                (1) 後方（タービン側）<br>
+                (2) 横_0m（公共道路側）<br>
+                (3a) 横_200m → 転倒側220m<br>
+                (3b) 横_222m → 転倒側222m
+            </div>
+
             <!-- 凡例 -->
             <div class="legend">
                 <h3>凡例</h3>
                 <div class="legend-grid">
                     <div class="legend-item">
-                        <div class="legend-marker bos-back">B1</div>
-                        <span>BOS後方</span>
+                        <div class="legend-marker" style="background:#e94560">B</div>
+                        <span>BOS 後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker bos-lat">B7</div>
-                        <span>BOS横方向</span>
+                        <div class="legend-marker" style="background:#ff9500">R</div>
+                        <span>RCCM 後方</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-back">R1</div>
-                        <span>RCCM後方</span>
+                        <div class="legend-marker" style="background:#4a90e2">B</div>
+                        <span>BOS 横_0m</span>
                     </div>
                     <div class="legend-item">
-                        <div class="legend-marker cmrc-lat">R5</div>
-                        <span>RCCM横方向</span>
+                        <div class="legend-marker" style="background:#00d4aa">R</div>
+                        <span>RCCM 横_0m</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker" style="background:#9b59b6">B</div>
+                        <span>BOS 横_200m</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker" style="background:#e056a0">R</div>
+                        <span>RCCM 横_200m</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker" style="background:#f39c12">B</div>
+                        <span>BOS 横_222m</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker" style="background:#2ecc71">R</div>
+                        <span>RCCM 横_222m</span>
                     </div>
                 </div>
             </div>
@@ -462,7 +516,7 @@
             </div>
 
             <!-- 解析結果テーブル -->
-            <h2>解析結果一覧</h2>
+            <h2>解析結果一覧（加速度 [m/s²]）</h2>
 
             <!-- 後方（タービン側）-->
             <div class="data-section" id="backwardSection">
@@ -471,62 +525,119 @@
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
-                            <th colspan="3" class="bos-header">BOS (B)</th>
-                            <th colspan="3" class="cmrc-header">RCCM (R)</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">RCCM</th>
+                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
                         </tr>
                         <tr>
-                            <th class="bos-header">No.</th>
-                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header">加速度</th>
                             <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">No.</th>
-                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header">加速度</th>
                             <th class="cmrc-header db-column">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>20m</td><td class="marker-cell bos">B1</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.2</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>50m</td><td class="marker-cell bos">B2</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">B3</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R1</td><td class="cmrc-cell">0.697</td><td class="cmrc-cell db-column">116.9</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">B4</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.3</td><td class="marker-cell cmrc">R2</td><td class="cmrc-cell">0.194</td><td class="cmrc-cell db-column">105.8</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">B5</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.1</td><td class="marker-cell cmrc">R3</td><td class="cmrc-cell">0.195</td><td class="cmrc-cell db-column">105.8</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">B6</td><td class="bos-cell">0.07</td><td class="bos-cell db-column">96.4</td><td class="marker-cell cmrc">R4</td><td class="cmrc-cell">0.129</td><td class="cmrc-cell db-column">102.2</td></tr>
+                        <tr><td>20m</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.1</td><td class="cmrc-cell">9.67</td><td class="cmrc-cell db-column">139.7</td><td class="ratio-high">&times;8.5</td></tr>
+                        <tr><td>50m</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="cmrc-cell">12.53</td><td class="cmrc-cell db-column">142.0</td><td class="ratio-high">&times;14.7</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.5</td><td class="cmrc-cell">2.10</td><td class="cmrc-cell db-column">126.4</td><td class="ratio-cell">&times;5.0</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.4</td><td class="cmrc-cell">0.79</td><td class="cmrc-cell db-column">118.0</td><td class="ratio-cell">&times;3.8</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.0</td><td class="cmrc-cell">0.32</td><td class="cmrc-cell db-column">110.1</td><td class="ratio-cell">&times;3.2</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.09</td><td class="bos-cell db-column">99.1</td><td class="cmrc-cell">0.20</td><td class="cmrc-cell db-column">106.0</td><td class="ratio-cell">&times;2.2</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 横方向（道路側）-->
-            <div class="data-section" id="lateralSection">
-                <h3>横方向（道路側）</h3>
-                <table id="lateralTable" class="db-hidden">
+            <!-- 横_0m（公共道路側）-->
+            <div class="data-section" id="lateral0Section">
+                <h3>横_0m（公共道路側）</h3>
+                <table id="lateral0Table" class="db-hidden">
                     <thead>
                         <tr>
                             <th rowspan="2">距離</th>
-                            <th colspan="3" class="bos-header">BOS (B)</th>
-                            <th colspan="3" class="cmrc-header">RCCM (R)</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">RCCM</th>
+                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
                         </tr>
                         <tr>
-                            <th class="bos-header">No.</th>
-                            <th class="bos-header">加速度<br>[m/s²]</th>
+                            <th class="bos-header">加速度</th>
                             <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">No.</th>
-                            <th class="cmrc-header">加速度<br>[m/s²]</th>
+                            <th class="cmrc-header">加速度</th>
                             <th class="cmrc-header db-column">dB</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>50m</td><td class="marker-cell bos">B7</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="na-cell">-</td><td class="na-cell">-</td><td class="na-cell db-column">-</td></tr>
-                        <tr><td>100m</td><td class="marker-cell bos">B8</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="marker-cell cmrc">R5</td><td class="cmrc-cell">0.970</td><td class="cmrc-cell db-column">119.7</td></tr>
-                        <tr><td>200m</td><td class="marker-cell bos">B9</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="marker-cell cmrc">R6</td><td class="cmrc-cell">0.537</td><td class="cmrc-cell db-column">114.6</td></tr>
-                        <tr><td>300m</td><td class="marker-cell bos">B10</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.4</td><td class="marker-cell cmrc">R7</td><td class="cmrc-cell">0.353</td><td class="cmrc-cell db-column">111.0</td></tr>
-                        <tr><td>400m</td><td class="marker-cell bos">B11</td><td class="bos-cell">0.22</td><td class="bos-cell db-column">106.8</td><td class="marker-cell cmrc">R8</td><td class="cmrc-cell">0.400</td><td class="cmrc-cell db-column">112.0</td></tr>
+                        <tr><td>50m</td><td class="bos-cell">1.07</td><td class="bos-cell db-column">120.6</td><td class="cmrc-cell">15.66</td><td class="cmrc-cell db-column">143.9</td><td class="ratio-high">&times;14.6</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">0.73</td><td class="bos-cell db-column">117.3</td><td class="cmrc-cell">2.03</td><td class="cmrc-cell db-column">126.1</td><td class="ratio-cell">&times;2.8</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.36</td><td class="bos-cell db-column">111.1</td><td class="cmrc-cell">1.14</td><td class="cmrc-cell db-column">121.1</td><td class="ratio-cell">&times;3.2</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.16</td><td class="bos-cell db-column">104.1</td><td class="cmrc-cell">0.84</td><td class="cmrc-cell db-column">118.5</td><td class="ratio-cell">&times;5.2</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.15</td><td class="bos-cell db-column">103.5</td><td class="cmrc-cell">0.49</td><td class="cmrc-cell db-column">113.8</td><td class="ratio-cell">&times;3.3</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- 解析結果の差異説明リンク -->
+            <!-- 横_200m（転倒側220m）-->
+            <div class="data-section" id="lateral200Section">
+                <h3>横_200m（転倒側220m）(3a)</h3>
+                <table id="lateral200Table" class="db-hidden">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">距離</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">RCCM</th>
+                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">加速度</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">加速度</th>
+                            <th class="cmrc-header db-column">dB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>50m</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="cmrc-cell">47.51</td><td class="cmrc-cell db-column">153.5</td><td class="ratio-high">&times;17.1</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="cmrc-cell">18.19</td><td class="cmrc-cell db-column">145.2</td><td class="ratio-high">&times;9.2</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="cmrc-cell">4.03</td><td class="cmrc-cell db-column">132.1</td><td class="ratio-high">&times;8.8</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.5</td><td class="cmrc-cell">2.21</td><td class="cmrc-cell db-column">126.9</td><td class="ratio-cell">&times;5.3</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.09</td><td class="cmrc-cell db-column">126.4</td><td class="ratio-high">&times;6.7</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 横_222m（転倒側222m）-->
+            <div class="data-section" id="lateral222Section">
+                <h3>横_222m（転倒側222m）(3b)</h3>
+                <table id="lateral222Table" class="db-hidden">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">距離</th>
+                            <th colspan="2" class="bos-header">BOS</th>
+                            <th colspan="2" class="cmrc-header">RCCM</th>
+                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
+                        </tr>
+                        <tr>
+                            <th class="bos-header">加速度</th>
+                            <th class="bos-header db-column">dB</th>
+                            <th class="cmrc-header">加速度</th>
+                            <th class="cmrc-header db-column">dB</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>50m</td><td class="bos-cell">3.04</td><td class="bos-cell db-column">129.7</td><td class="cmrc-cell">70.57</td><td class="cmrc-cell db-column">157.0</td><td class="ratio-high">&times;23.2</td></tr>
+                        <tr><td>100m</td><td class="bos-cell">1.39</td><td class="bos-cell db-column">122.9</td><td class="cmrc-cell">24.62</td><td class="cmrc-cell db-column">147.8</td><td class="ratio-high">&times;17.7</td></tr>
+                        <tr><td>200m</td><td class="bos-cell">0.52</td><td class="bos-cell db-column">114.3</td><td class="cmrc-cell">5.56</td><td class="cmrc-cell db-column">134.9</td><td class="ratio-high">&times;10.7</td></tr>
+                        <tr><td>300m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.26</td><td class="cmrc-cell db-column">127.1</td><td class="ratio-high">&times;7.3</td></tr>
+                        <tr><td>400m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.41</td><td class="cmrc-cell db-column">127.6</td><td class="ratio-high">&times;7.8</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- リンク -->
             <div class="explanation-link">
                 <a href="comparison_explanation.html" target="_blank" class="explanation-btn">
                     解析結果の差異についての説明資料
+                </a>
+                <a href="contour_overlay.html" target="_blank" class="explanation-btn contour-btn">
+                    RCCM コンター図オーバーレイ表示
                 </a>
             </div>
 
@@ -551,6 +662,11 @@
                 </table>
                 <div class="formula">1 m/s² = 120 dB</div>
             </div>
+
+            <div class="note">
+                ※ 倍率が×10以上は赤色で強調表示<br>
+                ※ 横_200m/222mは煙突先端付近（転倒側）の横断面での計測
+            </div>
         </div>
     </div>
 
@@ -563,39 +679,94 @@
         let currentDirection = 'all';
         let showDb = false;
 
-        // BOSデータ
+        // BOSデータ（4方向）
         const bosData = {
             backward: [
-                { id: 'B1', dist: 20, acc: 1.14, db: 121.2 },
-                { id: 'B2', dist: 50, acc: 0.85, db: 118.6 },
-                { id: 'B3', dist: 100, acc: 0.42, db: 112.4 },
-                { id: 'B4', dist: 200, acc: 0.21, db: 106.3 },
-                { id: 'B5', dist: 300, acc: 0.10, db: 100.1 },
-                { id: 'B6', dist: 400, acc: 0.07, db: 96.4 }
+                { id: 'B1', dist: 20, acc: 1.14 },
+                { id: 'B2', dist: 50, acc: 0.85 },
+                { id: 'B3', dist: 100, acc: 0.42 },
+                { id: 'B4', dist: 200, acc: 0.21 },
+                { id: 'B5', dist: 300, acc: 0.10 },
+                { id: 'B6', dist: 400, acc: 0.09 }
             ],
-            lateral: [
-                { id: 'B7', dist: 50, acc: 2.78, db: 128.9 },
-                { id: 'B8', dist: 100, acc: 1.97, db: 125.9 },
-                { id: 'B9', dist: 200, acc: 0.46, db: 113.3 },
-                { id: 'B10', dist: 300, acc: 0.42, db: 112.4 },
-                { id: 'B11', dist: 400, acc: 0.22, db: 106.8 }
+            lateral_0m: [
+                { id: 'B7', dist: 50, acc: 1.07 },
+                { id: 'B8', dist: 100, acc: 0.73 },
+                { id: 'B9', dist: 200, acc: 0.36 },
+                { id: 'B10', dist: 300, acc: 0.16 },
+                { id: 'B11', dist: 400, acc: 0.15 }
+            ],
+            lateral_200m: [
+                { id: 'B12', dist: 50, acc: 2.78 },
+                { id: 'B13', dist: 100, acc: 1.97 },
+                { id: 'B14', dist: 200, acc: 0.46 },
+                { id: 'B15', dist: 300, acc: 0.42 },
+                { id: 'B16', dist: 400, acc: 0.31 }
+            ],
+            lateral_222m: [
+                { id: 'B17', dist: 50, acc: 3.04 },
+                { id: 'B18', dist: 100, acc: 1.39 },
+                { id: 'B19', dist: 200, acc: 0.52 },
+                { id: 'B20', dist: 300, acc: 0.31 },
+                { id: 'B21', dist: 400, acc: 0.31 }
             ]
         };
 
-        // RCCMデータ
-        const cmrcData = {
+        // RCCMデータ（4方向）
+        const rccmData = {
             backward: [
-                { id: 'R1', dist: 100, acc: 0.697, db: 116.9 },
-                { id: 'R2', dist: 200, acc: 0.194, db: 105.8 },
-                { id: 'R3', dist: 300, acc: 0.195, db: 105.8 },
-                { id: 'R4', dist: 400, acc: 0.129, db: 102.2 }
+                { id: 'R1', dist: 20, acc: 9.67 },
+                { id: 'R2', dist: 50, acc: 12.53 },
+                { id: 'R3', dist: 100, acc: 2.10 },
+                { id: 'R4', dist: 200, acc: 0.79 },
+                { id: 'R5', dist: 300, acc: 0.32 },
+                { id: 'R6', dist: 400, acc: 0.20 }
             ],
-            lateral: [
-                { id: 'R5', dist: 100, acc: 0.970, db: 119.7 },
-                { id: 'R6', dist: 200, acc: 0.537, db: 114.6 },
-                { id: 'R7', dist: 300, acc: 0.353, db: 111.0 },
-                { id: 'R8', dist: 400, acc: 0.400, db: 112.0 }
+            lateral_0m: [
+                { id: 'R7', dist: 50, acc: 15.66 },
+                { id: 'R8', dist: 100, acc: 2.03 },
+                { id: 'R9', dist: 200, acc: 1.14 },
+                { id: 'R10', dist: 300, acc: 0.84 },
+                { id: 'R11', dist: 400, acc: 0.49 }
+            ],
+            lateral_200m: [
+                { id: 'R12', dist: 50, acc: 47.51 },
+                { id: 'R13', dist: 100, acc: 18.19 },
+                { id: 'R14', dist: 200, acc: 4.03 },
+                { id: 'R15', dist: 300, acc: 2.21 },
+                { id: 'R16', dist: 400, acc: 2.09 }
+            ],
+            lateral_222m: [
+                { id: 'R17', dist: 50, acc: 70.57 },
+                { id: 'R18', dist: 100, acc: 24.62 },
+                { id: 'R19', dist: 200, acc: 5.56 },
+                { id: 'R20', dist: 300, acc: 2.26 },
+                { id: 'R21', dist: 400, acc: 2.41 }
             ]
+        };
+
+        // 倍率データ
+        const ratioData = {
+            backward: [8.5, 14.7, 5.0, 3.8, 3.2, 2.2],
+            lateral_0m: [14.6, 2.8, 3.2, 5.2, 3.3],
+            lateral_200m: [17.1, 9.2, 8.8, 5.3, 6.7],
+            lateral_222m: [23.2, 17.7, 10.7, 7.3, 7.8]
+        };
+
+        // 方向ごとの色設定
+        const dirColors = {
+            backward:      { bos: '#e94560', rccm: '#ff9500', line: '#e94560' },
+            lateral_0m:    { bos: '#4a90e2', rccm: '#00d4aa', line: '#4a90e2' },
+            lateral_200m:  { bos: '#9b59b6', rccm: '#e056a0', line: '#9b59b6' },
+            lateral_222m:  { bos: '#f39c12', rccm: '#2ecc71', line: '#f39c12' }
+        };
+
+        // 方向名
+        const dirNames = {
+            backward: '後方',
+            lateral_0m: '横_0m',
+            lateral_200m: '横_200m',
+            lateral_222m: '横_222m'
         };
 
         // ========== マップ初期化 ==========
@@ -606,16 +777,16 @@
         });
 
         const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-            attribution: '© Esri'
+            attribution: '&copy; Esri'
         });
         const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap'
+            attribution: '&copy; OpenStreetMap'
         });
         satelliteLayer.addTo(map);
         L.control.layers({ "航空写真": satelliteLayer, "地図": osmLayer }).addTo(map);
 
         const bosLayer = L.layerGroup().addTo(map);
-        const cmrcLayer = L.layerGroup();
+        const rccmLayer = L.layerGroup();
         const circlesLayer = L.layerGroup().addTo(map);
         const linesLayer = L.layerGroup().addTo(map);
         let centerMarker;
@@ -639,6 +810,25 @@
             return [lat2 * 180 / Math.PI, lng2 * 180 / Math.PI];
         }
 
+        // 方向ごとの基準点と方位角を取得
+        function getDirOriginAndBearing(dir) {
+            const fallDirection = currentRotation + 180;
+            const lateralBearing = currentRotation + 90;
+
+            switch(dir) {
+                case 'backward':
+                    return { origin: [centerLat, centerLng], bearing: currentRotation };
+                case 'lateral_0m':
+                    return { origin: [centerLat, centerLng], bearing: lateralBearing };
+                case 'lateral_200m':
+                    const origin200 = offsetLatLng(centerLat, centerLng, 220, fallDirection);
+                    return { origin: origin200, bearing: lateralBearing };
+                case 'lateral_222m':
+                    const origin222 = offsetLatLng(centerLat, centerLng, 222, fallDirection);
+                    return { origin: origin222, bearing: lateralBearing };
+            }
+        }
+
         // ========== 中心マーカー ==========
         function createCenterMarker() {
             const icon = L.divIcon({
@@ -658,111 +848,70 @@
         // ========== マーカー作成 ==========
         function createMarkers() {
             bosLayer.clearLayers();
-            cmrcLayer.clearLayers();
+            rccmLayer.clearLayers();
 
-            const showBackward = currentDirection === 'all' || currentDirection === 'backward';
-            const showLateral = currentDirection === 'all' || currentDirection === 'lateral';
+            const directions = ['backward', 'lateral_0m', 'lateral_200m', 'lateral_222m'];
 
-            // BOS 後方
-            if (showBackward) {
-                bosData.backward.forEach(point => {
-                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
+            directions.forEach(dir => {
+                if (currentDirection !== 'all' && currentDirection !== dir) return;
+
+                const { origin, bearing } = getDirOriginAndBearing(dir);
+                const colors = dirColors[dir];
+                const dirName = dirNames[dir];
+
+                // BOS マーカー
+                bosData[dir].forEach((point, idx) => {
+                    const basePos = offsetLatLng(origin[0], origin[1], point.dist, bearing);
                     const pos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 90) : basePos;
+                        offsetLatLng(basePos[0], basePos[1], 15, bearing + 90) : basePos;
 
+                    const ratio = ratioData[dir][idx];
                     const marker = L.circleMarker(pos, {
-                        radius: 16,
-                        fillColor: '#e94560',
+                        radius: 14,
+                        fillColor: colors.bos,
                         color: '#fff',
-                        weight: 3,
+                        weight: 2,
                         fillOpacity: 0.9
                     });
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
-                        <b style="color:#e94560">BOS ${point.id} 後方 ${point.dist}m</b><br>
+                        <b style="color:${colors.bos}">BOS ${point.id} ${dirName} ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
-                        振動レベル: <b>${point.db} dB</b>
+                        dB: <b>${(120 + 20*Math.log10(point.acc)).toFixed(1)}</b><br>
+                        倍率(RCCM/BOS): <b>&times;${ratio}</b>
                     `);
                     bosLayer.addLayer(marker);
                 });
-            }
 
-            // BOS 横方向
-            if (showLateral) {
-                bosData.lateral.forEach(point => {
-                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
+                // RCCM マーカー
+                rccmData[dir].forEach((point, idx) => {
+                    const basePos = offsetLatLng(origin[0], origin[1], point.dist, bearing);
                     const pos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation) : basePos;
+                        offsetLatLng(basePos[0], basePos[1], 15, bearing - 90) : basePos;
 
+                    const ratio = ratioData[dir][idx];
                     const marker = L.circleMarker(pos, {
-                        radius: 16,
-                        fillColor: '#4a90e2',
+                        radius: 14,
+                        fillColor: colors.rccm,
                         color: '#fff',
-                        weight: 3,
+                        weight: 2,
                         fillOpacity: 0.9
                     });
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
-                        <b style="color:#4a90e2">BOS ${point.id} 横方向 ${point.dist}m</b><br>
+                        <b style="color:${colors.rccm}">RCCM ${point.id} ${dirName} ${point.dist}m</b><br>
                         加速度: <b>${point.acc} m/s²</b><br>
-                        振動レベル: <b>${point.db} dB</b>
+                        dB: <b>${(120 + 20*Math.log10(point.acc)).toFixed(1)}</b><br>
+                        倍率(RCCM/BOS): <b>&times;${ratio}</b>
                     `);
-                    bosLayer.addLayer(marker);
+                    rccmLayer.addLayer(marker);
                 });
-            }
-
-            // RCCM 後方
-            if (showBackward) {
-                cmrcData.backward.forEach(point => {
-                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation);
-                    const pos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation - 90) : basePos;
-
-                    const marker = L.circleMarker(pos, {
-                        radius: 16,
-                        fillColor: '#ff9500',
-                        color: '#fff',
-                        weight: 3,
-                        fillOpacity: 0.9
-                    });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
-                    marker.bindPopup(`
-                        <b style="color:#ff9500">RCCM ${point.id} 後方 ${point.dist}m</b><br>
-                        加速度: <b>${point.acc} m/s²</b><br>
-                        振動レベル: <b>${point.db} dB</b>
-                    `);
-                    cmrcLayer.addLayer(marker);
-                });
-            }
-
-            // RCCM 横方向
-            if (showLateral) {
-                cmrcData.lateral.forEach(point => {
-                    const basePos = offsetLatLng(centerLat, centerLng, point.dist, currentRotation + 90);
-                    const pos = currentCompany === 'both' ?
-                        offsetLatLng(basePos[0], basePos[1], 20, currentRotation + 180) : basePos;
-
-                    const marker = L.circleMarker(pos, {
-                        radius: 16,
-                        fillColor: '#00d4aa',
-                        color: '#fff',
-                        weight: 3,
-                        fillOpacity: 0.9
-                    });
-                    marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
-                    marker.bindPopup(`
-                        <b style="color:#00d4aa">RCCM ${point.id} 横方向 ${point.dist}m</b><br>
-                        加速度: <b>${point.acc} m/s²</b><br>
-                        振動レベル: <b>${point.db} dB</b>
-                    `);
-                    cmrcLayer.addLayer(marker);
-                });
-            }
+            });
 
             updateLayerVisibility();
         }
 
-        // ========== 同心円・接続線 ==========
+        // ========== 同心円 ==========
         function updateCircles() {
             circlesLayer.clearLayers();
             const distances = [50, 100, 200, 300, 400];
@@ -776,8 +925,8 @@
 
                 L.polyline(circlePoints, {
                     color: colors[i],
-                    weight: 4,
-                    opacity: 0.9,
+                    weight: 3,
+                    opacity: 0.7,
                     dashArray: '10, 6'
                 }).addTo(circlesLayer);
 
@@ -793,8 +942,11 @@
             });
         }
 
+        // ========== 接続線 ==========
         function updateLines() {
             linesLayer.clearLayers();
+            const fallDirection = currentRotation + 180;
+            const lateralBearing = currentRotation + 90;
 
             // 後方接続線
             const backwardEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation);
@@ -805,17 +957,54 @@
                 dashArray: '8, 6'
             }).addTo(linesLayer);
 
-            // 横方向接続線
-            const lateralEnd = offsetLatLng(centerLat, centerLng, 420, currentRotation + 90);
-            L.polyline([[centerLat, centerLng], lateralEnd], {
+            // 横_0m 接続線
+            const lat0End = offsetLatLng(centerLat, centerLng, 420, lateralBearing);
+            L.polyline([[centerLat, centerLng], lat0End], {
                 color: '#4a90e2',
                 weight: 3,
                 opacity: 0.7,
                 dashArray: '8, 6'
             }).addTo(linesLayer);
 
+            // 横_200m 接続線
+            const origin200 = offsetLatLng(centerLat, centerLng, 220, fallDirection);
+            const lat200End = offsetLatLng(origin200[0], origin200[1], 420, lateralBearing);
+            L.polyline([origin200, lat200End], {
+                color: '#9b59b6',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
+            }).addTo(linesLayer);
+
+            // 横_200m 原点マーカー
+            L.circleMarker(origin200, {
+                radius: 6,
+                fillColor: '#9b59b6',
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.8
+            }).addTo(linesLayer).bindTooltip('220m地点', { direction: 'top' });
+
+            // 横_222m 接続線
+            const origin222 = offsetLatLng(centerLat, centerLng, 222, fallDirection);
+            const lat222End = offsetLatLng(origin222[0], origin222[1], 420, lateralBearing);
+            L.polyline([origin222, lat222End], {
+                color: '#f39c12',
+                weight: 3,
+                opacity: 0.7,
+                dashArray: '8, 6'
+            }).addTo(linesLayer);
+
+            // 横_222m 原点マーカー
+            L.circleMarker(origin222, {
+                radius: 6,
+                fillColor: '#f39c12',
+                color: '#fff',
+                weight: 2,
+                fillOpacity: 0.8
+            }).addTo(linesLayer).bindTooltip('222m地点', { direction: 'top' });
+
             // 煙突転倒表示
-            const fallDirection = currentRotation + 180;
             const tipPos = offsetLatLng(centerLat, centerLng, 230, fallDirection);
 
             L.polyline([[centerLat, centerLng], tipPos], {
@@ -840,13 +1029,13 @@
         function updateLayerVisibility() {
             if (currentCompany === 'bos') {
                 map.addLayer(bosLayer);
-                map.removeLayer(cmrcLayer);
+                map.removeLayer(rccmLayer);
             } else if (currentCompany === 'cmrc') {
                 map.removeLayer(bosLayer);
-                map.addLayer(cmrcLayer);
+                map.addLayer(rccmLayer);
             } else {
                 map.addLayer(bosLayer);
-                map.addLayer(cmrcLayer);
+                map.addLayer(rccmLayer);
             }
         }
 
@@ -867,12 +1056,18 @@
 
             document.getElementById('allDirBtn').classList.toggle('active', direction === 'all');
             document.getElementById('backwardDirBtn').classList.toggle('active', direction === 'backward');
-            document.getElementById('lateralDirBtn').classList.toggle('active', direction === 'lateral');
+            document.getElementById('lat0DirBtn').classList.toggle('active', direction === 'lateral_0m');
+            document.getElementById('lat200DirBtn').classList.toggle('active', direction === 'lateral_200m');
+            document.getElementById('lat222DirBtn').classList.toggle('active', direction === 'lateral_222m');
 
             document.getElementById('backwardSection').style.display =
                 (direction === 'all' || direction === 'backward') ? 'block' : 'none';
-            document.getElementById('lateralSection').style.display =
-                (direction === 'all' || direction === 'lateral') ? 'block' : 'none';
+            document.getElementById('lateral0Section').style.display =
+                (direction === 'all' || direction === 'lateral_0m') ? 'block' : 'none';
+            document.getElementById('lateral200Section').style.display =
+                (direction === 'all' || direction === 'lateral_200m') ? 'block' : 'none';
+            document.getElementById('lateral222Section').style.display =
+                (direction === 'all' || direction === 'lateral_222m') ? 'block' : 'none';
 
             createMarkers();
         }
@@ -881,9 +1076,9 @@
         function toggleDb() {
             showDb = !showDb;
             document.getElementById('dbBtn').classList.toggle('active', showDb);
-            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示' : 'dB列を非表示';
+            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示中' : 'dB列を非表示';
 
-            const tables = ['backwardTable', 'lateralTable'];
+            const tables = ['backwardTable', 'lateral0Table', 'lateral200Table', 'lateral222Table'];
             tables.forEach(tableId => {
                 const table = document.getElementById(tableId);
                 if (table) {
@@ -895,7 +1090,7 @@
         // ========== 回転スライダー ==========
         document.getElementById('rotationSlider').addEventListener('input', function(e) {
             currentRotation = parseInt(e.target.value);
-            document.getElementById('rotationValue').textContent = currentRotation + '°';
+            document.getElementById('rotationValue').textContent = currentRotation + '\u00B0';
             createMarkers();
             updateCircles();
             updateLines();
@@ -916,7 +1111,7 @@
                 box-shadow: none !important;
                 color: #fff !important;
                 font-weight: bold !important;
-                font-size: 12px !important;
+                font-size: 10px !important;
             }
             .distance-label {
                 background: rgba(0,0,0,0.8);
