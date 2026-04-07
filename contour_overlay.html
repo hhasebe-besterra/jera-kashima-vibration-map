@@ -13,12 +13,14 @@
             background: #1a1a2e;
             color: #eee;
         }
-        #map {
-            width: 100%;
-            height: 100vh;
+        #map { width: 100%; height: 100vh; }
+
+        .leaflet-image-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            pointer-events: none;
         }
 
-        /* コントロールパネル */
         .control-panel {
             position: absolute;
             top: 10px;
@@ -40,13 +42,13 @@
             padding-bottom: 8px;
         }
         .control-group {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
         }
         .control-group label {
             display: block;
             font-size: 12px;
             color: #94d2bd;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             font-weight: bold;
         }
         .control-row {
@@ -74,10 +76,9 @@
             font-size: 14px;
             font-weight: bold;
             color: #ffa502;
-            min-width: 50px;
+            min-width: 55px;
             text-align: right;
         }
-
         .toggle-btn {
             width: 100%;
             padding: 10px;
@@ -94,10 +95,6 @@
             background: #e94560;
             color: #fff;
         }
-        .toggle-btn:hover {
-            opacity: 0.8;
-        }
-
         .back-link {
             display: block;
             margin-top: 12px;
@@ -112,11 +109,8 @@
             text-decoration: none;
             transition: all 0.3s;
         }
-        .back-link:hover {
-            transform: translateY(-2px);
-        }
+        .back-link:hover { transform: translateY(-2px); }
 
-        /* 凡例 */
         .color-legend {
             background: rgba(0,0,0,0.3);
             border-radius: 6px;
@@ -143,22 +137,16 @@
             font-size: 10px;
             color: #aaa;
         }
-
         .note {
             font-size: 10px;
             color: #888;
             margin-top: 8px;
             line-height: 1.5;
         }
-
-        /* サイズ調整グリッド */
         .size-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-        }
-        .size-grid .control-group {
-            margin-bottom: 8px;
         }
     </style>
 </head>
@@ -178,39 +166,39 @@
         <div class="control-group">
             <label>透過度</label>
             <div class="control-row">
-                <input type="range" id="opacitySlider" min="0" max="100" value="60" oninput="updateOpacity()">
+                <input type="range" id="opacitySlider" min="0" max="100" value="60" oninput="updateParams()">
                 <div class="control-value" id="opacityValue">60%</div>
             </div>
         </div>
 
         <div class="control-group">
-            <label>回転角度（煙突方向）</label>
+            <label>煙突後方角度（度）</label>
             <div class="control-row">
-                <input type="range" id="rotationSlider" min="0" max="360" value="153" oninput="updateOverlay()">
+                <input type="range" id="rotationSlider" min="0" max="360" value="153" oninput="updateParams()">
                 <div class="control-value" id="rotationValue">153°</div>
             </div>
         </div>
 
         <div class="control-group">
-            <label>画像サイズ（スケール）</label>
+            <label>スケール微調整</label>
             <div class="control-row">
-                <input type="range" id="scaleSlider" min="50" max="200" value="100" oninput="updateOverlay()">
+                <input type="range" id="scaleSlider" min="50" max="200" value="100" oninput="updateParams()">
                 <div class="control-value" id="scaleValue">100%</div>
             </div>
         </div>
 
         <div class="size-grid">
             <div class="control-group">
-                <label>X方向オフセット [m]</label>
+                <label>転倒方向オフセット</label>
                 <div class="control-row">
-                    <input type="range" id="offsetXSlider" min="-200" max="200" value="0" oninput="updateOverlay()">
+                    <input type="range" id="offsetXSlider" min="-200" max="200" value="0" oninput="updateParams()">
                     <div class="control-value" id="offsetXValue">0m</div>
                 </div>
             </div>
             <div class="control-group">
-                <label>Y方向オフセット [m]</label>
+                <label>横方向オフセット</label>
                 <div class="control-row">
-                    <input type="range" id="offsetYSlider" min="-200" max="200" value="0" oninput="updateOverlay()">
+                    <input type="range" id="offsetYSlider" min="-200" max="200" value="0" oninput="updateParams()">
                     <div class="control-value" id="offsetYValue">0m</div>
                 </div>
             </div>
@@ -221,35 +209,34 @@
             <div class="color-bar"></div>
             <div class="color-labels">
                 <span>0</span>
-                <span>1e+3</span>
-                <span>3e+3</span>
-                <span>5e+3</span>
-                <span>7e+3</span>
+                <span>2e+3</span>
+                <span>4e+3</span>
+                <span>6e+3</span>
+                <span>8e+3</span>
                 <span>1e+4</span>
             </div>
         </div>
 
         <div class="note">
             ※ スライダーでコンター図の位置・サイズ・角度を微調整できます<br>
-            ※ コンター図はRCCM解析のResultant Acceleration分布です<br>
-            ※ 煙突長さ230mを基準にスケーリングしています
+            ※ 煙突長さ230mを基準にスケーリング<br>
+            ※ 煙突基部を回転の軸としています
         </div>
 
-        <a href="index.html" class="back-link">← 振動解析比較マップに戻る</a>
+        <a href="index.html" class="back-link">&larr; 振動解析比較マップに戻る</a>
     </div>
 
     <script>
-        // ========== 設定 ==========
+        // ========== 定数 ==========
         const centerLat = 35.917924;
         const centerLng = 140.698911;
 
-        // コンター画像の元サイズ（推定: 煙突230mをベースにスケーリング）
-        // 画像内の煙突が約40%の幅を占めるため、全体幅 ≈ 575m, 高さ ≈ 400m
-        const baseWidthM = 575;   // 画像の幅 [m]
-        const baseHeightM = 400;  // 画像の高さ [m]
-        // 煙突基部は画像左端から約25%の位置
-        const chimneyCenterRatioX = 0.25;
-        const chimneyCenterRatioY = 0.50;
+        // コンター画像の解析値
+        // 煙突(230m)が画像内で260pxに相当 → 0.885 m/px
+        const IMAGE_M_PER_PX = 0.885;
+        // 煙突基部の画像内位置（左上原点、0-1の比率）
+        const ANCHOR_RATIO_X = 0.177;
+        const ANCHOR_RATIO_Y = 0.562;
 
         // ========== マップ初期化 ==========
         const map = L.map('map', {
@@ -273,7 +260,6 @@
             const bearing = bearingDegrees * Math.PI / 180;
             const lat1 = lat * Math.PI / 180;
             const lng1 = lng * Math.PI / 180;
-
             const lat2 = Math.asin(
                 Math.sin(lat1) * Math.cos(distanceMeters / R) +
                 Math.cos(lat1) * Math.sin(distanceMeters / R) * Math.cos(bearing)
@@ -282,7 +268,6 @@
                 Math.sin(bearing) * Math.sin(distanceMeters / R) * Math.cos(lat1),
                 Math.cos(distanceMeters / R) - Math.sin(lat1) * Math.sin(lat2)
             );
-
             return [lat2 * 180 / Math.PI, lng2 * 180 / Math.PI];
         }
 
@@ -294,119 +279,123 @@
             iconAnchor: [10, 10]
         });
         L.marker([centerLat, centerLng], { icon: centerIcon, zIndexOffset: 1000 })
-            .addTo(map)
-            .bindPopup('<b>煙突位置（中心）</b>');
+            .addTo(map).bindPopup('<b>煙突位置（基部）</b>');
 
-        // ========== コンターオーバーレイ ==========
-        let contourOverlay = null;
+        // ========== Canvas コンターオーバーレイ ==========
+        const contourImage = new Image();
+        contourImage.src = 'contour_rev002.png';
+
         let contourVisible = true;
+        let canvas, ctx;
 
-        function updateOverlay() {
-            const rotation = parseInt(document.getElementById('rotationSlider').value);
-            const scale = parseInt(document.getElementById('scaleSlider').value) / 100;
-            const offsetX = parseInt(document.getElementById('offsetXSlider').value);
-            const offsetY = parseInt(document.getElementById('offsetYSlider').value);
+        // カスタムCanvasレイヤー
+        const ContourCanvasLayer = L.Layer.extend({
+            onAdd: function(map) {
+                this._map = map;
+                canvas = document.createElement('canvas');
+                canvas.className = 'leaflet-image-canvas';
+                canvas.style.pointerEvents = 'none';
+                map.getPane('overlayPane').appendChild(canvas);
+                ctx = canvas.getContext('2d');
 
-            document.getElementById('rotationValue').textContent = rotation + '\u00B0';
-            document.getElementById('scaleValue').textContent = Math.round(scale * 100) + '%';
-            document.getElementById('offsetXValue').textContent = offsetX + 'm';
-            document.getElementById('offsetYValue').textContent = offsetY + 'm';
+                map.on('zoom viewreset resize moveend zoomend', this._redraw, this);
+                contourImage.onload = () => this._redraw();
+                if (contourImage.complete) this._redraw();
+            },
 
-            // 画像の実寸（スケール適用）
-            const widthM = baseWidthM * scale;
-            const heightM = baseHeightM * scale;
-
-            // 煙突の転倒方向 = rotation + 180°
-            const fallDirection = rotation + 180;
-
-            // 画像の中心を基準に煙突基部からのオフセットを計算
-            // 画像内で煙突基部はleft 25%, center verticallyにある
-            // → 画像中心から見て、煙突基部は左に (0.5-0.25)*width = 0.25*width の位置
-            // → 画像中心は煙突基部から右に 0.25*widthM の位置（= 転倒方向に移動）
-            const imageCenterDist = (0.5 - chimneyCenterRatioX) * widthM;
-
-            // 画像中心の地理座標（煙突基部から転倒方向にimageCenterDist移動、+オフセット）
-            let imgCenter = offsetLatLng(centerLat, centerLng, imageCenterDist, fallDirection);
-            // X/Yオフセット適用（Xは転倒方向、Yは直角方向）
-            if (offsetX !== 0) {
-                imgCenter = offsetLatLng(imgCenter[0], imgCenter[1], offsetX, fallDirection);
-            }
-            if (offsetY !== 0) {
-                imgCenter = offsetLatLng(imgCenter[0], imgCenter[1], offsetY, fallDirection + 90);
-            }
-
-            // バウンディングボックス（回転前の矩形）
-            const halfW = widthM / 2;
-            const halfH = heightM / 2;
-
-            // 画像のboundsを計算（非回転 - 南北方向に配置してCSSで回転）
-            const south = imgCenter[0] - (halfH / 111320);
-            const north = imgCenter[0] + (halfH / 111320);
-            const west = imgCenter[1] - (halfW / (111320 * Math.cos(imgCenter[0] * Math.PI / 180)));
-            const east = imgCenter[1] + (halfW / (111320 * Math.cos(imgCenter[0] * Math.PI / 180)));
-
-            const bounds = [[south, west], [north, east]];
-
-            // 既存のオーバーレイを削除
-            if (contourOverlay) {
-                map.removeLayer(contourOverlay);
-            }
-
-            // 新しいオーバーレイを作成
-            contourOverlay = L.imageOverlay('contour_rev002.png', bounds, {
-                opacity: parseInt(document.getElementById('opacitySlider').value) / 100,
-                interactive: false
-            }).addTo(map);
-
-            // CSS回転を適用
-            // 画像の「右」方向が転倒方向に一致するように回転
-            // CSSのrotateは時計回り、地図の北が上
-            // 画像内の煙突は右向き（=東=90°）なので、 fallDirection - 90° 回転する
-            const cssRotation = fallDirection - 90;
-
-            const imgElement = contourOverlay.getElement();
-            if (imgElement) {
-                imgElement.style.transformOrigin = 'center center';
-                imgElement.style.transform = `rotate(${cssRotation}deg)`;
-            }
-
-            if (!contourVisible) {
-                contourOverlay.setOpacity(0);
-            }
-
-            // 煙突転倒線を描画
-            updateChimneyLine(rotation);
-        }
-
-        function updateOpacity() {
-            const opacity = parseInt(document.getElementById('opacitySlider').value);
-            document.getElementById('opacityValue').textContent = opacity + '%';
-            if (contourOverlay && contourVisible) {
-                contourOverlay.setOpacity(opacity / 100);
-            }
-        }
-
-        function toggleContour() {
-            contourVisible = !contourVisible;
-            const btn = document.getElementById('contourToggle');
-            btn.classList.toggle('active', contourVisible);
-            btn.textContent = contourVisible ? 'コンター図: 表示中' : 'コンター図: 非表示';
-
-            if (contourOverlay) {
-                if (contourVisible) {
-                    contourOverlay.setOpacity(parseInt(document.getElementById('opacitySlider').value) / 100);
-                } else {
-                    contourOverlay.setOpacity(0);
+            onRemove: function(map) {
+                map.off('zoom viewreset resize moveend zoomend', this._redraw, this);
+                if (canvas && canvas.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
                 }
-            }
-        }
+            },
 
-        // ========== 煙突転倒線 ==========
+            _redraw: function() {
+                if (!this._map || !contourImage.complete) return;
+
+                const mapSize = this._map.getSize();
+                canvas.width = mapSize.x;
+                canvas.height = mapSize.y;
+
+                // Leafletのpane位置に合わせてcanvasを配置
+                const topLeftPoint = this._map.containerPointToLayerPoint([0, 0]);
+                L.DomUtil.setPosition(canvas, topLeftPoint);
+
+                ctx.clearRect(0, 0, mapSize.x, mapSize.y);
+
+                if (!contourVisible) return;
+
+                // パラメータ取得
+                const opacity = parseInt(document.getElementById('opacitySlider').value) / 100;
+                const backwardAngle = parseInt(document.getElementById('rotationSlider').value);
+                const scale = parseInt(document.getElementById('scaleSlider').value) / 100;
+                const offsetX = parseInt(document.getElementById('offsetXSlider').value);
+                const offsetY = parseInt(document.getElementById('offsetYSlider').value);
+                const fallDirection = backwardAngle + 180;
+
+                // 煙突基部のアンカー位置（オフセット適用）
+                let anchorLatLng = [centerLat, centerLng];
+                if (offsetX !== 0) {
+                    anchorLatLng = offsetLatLng(anchorLatLng[0], anchorLatLng[1], offsetX, fallDirection);
+                }
+                if (offsetY !== 0) {
+                    anchorLatLng = offsetLatLng(anchorLatLng[0], anchorLatLng[1], offsetY, fallDirection + 90);
+                }
+
+                // 煙突基部のコンテナピクセル座標
+                const anchorPx = this._map.latLngToContainerPoint(anchorLatLng);
+
+                // 現在のズームでの1メートルあたりのピクセル数を計算
+                const lat = anchorLatLng[0];
+                const lng = anchorLatLng[1];
+                const p1 = this._map.latLngToContainerPoint([lat, lng]);
+                const oneMeterLng = 1 / (111320 * Math.cos(lat * Math.PI / 180));
+                const p2 = this._map.latLngToContainerPoint([lat, lng + oneMeterLng]);
+                const pixelsPerMeter = Math.abs(p2.x - p1.x);
+
+                // 画像の描画スケール
+                // IMAGE_M_PER_PX = 0.885 m/px → 1px in image = 0.885m in real
+                // We need: drawScale = pixelsPerMeter * IMAGE_M_PER_PX * userScale
+                const drawScale = pixelsPerMeter * IMAGE_M_PER_PX * scale;
+
+                const imgW = contourImage.width * drawScale;
+                const imgH = contourImage.height * drawScale;
+
+                // 回転角度: 画像の「右」方向を転倒方向に合わせる
+                // 画像内で煙突は右向き → 地図上のfallDirection に合わせる
+                // 地図は北が上(0°) → CSS/Canvasの角度はx軸から時計回り
+                // Canvas: 0° = 右(東), 地図: 0° = 上(北)
+                // 地図のfallDirection°を Canvasの角度に変換: canvasAngle = fallDirection - 90
+                const canvasAngle = (fallDirection - 90) * Math.PI / 180;
+
+                // 描画
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.translate(anchorPx.x, anchorPx.y);
+                ctx.rotate(canvasAngle);
+                // アンカー位置（煙突基部）が画像内のANCHOR_RATIO位置に来るように描画
+                ctx.drawImage(contourImage,
+                    -ANCHOR_RATIO_X * imgW,
+                    -ANCHOR_RATIO_Y * imgH,
+                    imgW, imgH);
+                ctx.restore();
+            },
+
+            redraw: function() {
+                this._redraw();
+            }
+        });
+
+        const contourLayer = new ContourCanvasLayer();
+        contourLayer.addTo(map);
+
+        // ========== 煙突転倒線・同心円 ==========
         const chimneyLayer = L.layerGroup().addTo(map);
 
-        function updateChimneyLine(rotation) {
+        function updateChimneyLine() {
             chimneyLayer.clearLayers();
-            const fallDirection = rotation + 180;
+            const backwardAngle = parseInt(document.getElementById('rotationSlider').value);
+            const fallDirection = backwardAngle + 180;
             const tipPos = offsetLatLng(centerLat, centerLng, 230, fallDirection);
 
             L.polyline([[centerLat, centerLng], tipPos], {
@@ -426,39 +415,50 @@
                 })
             }).addTo(chimneyLayer);
 
-            // 同心円（距離参考）
+            // 同心円
             const distances = [50, 100, 200, 300, 400];
             const colors = ['#ff6b6b88', '#ffa50288', '#94d2bd88', '#4a90e288', '#9b59b688'];
             distances.forEach((dist, i) => {
-                const circlePoints = [];
-                for (let angle = 0; angle <= 360; angle += 3) {
-                    circlePoints.push(offsetLatLng(centerLat, centerLng, dist, angle));
+                const pts = [];
+                for (let a = 0; a <= 360; a += 3) {
+                    pts.push(offsetLatLng(centerLat, centerLng, dist, a));
                 }
-                L.polyline(circlePoints, {
-                    color: colors[i],
-                    weight: 2,
-                    opacity: 0.5,
-                    dashArray: '8, 6'
+                L.polyline(pts, { color: colors[i], weight: 2, opacity: 0.5, dashArray: '8, 6' }).addTo(chimneyLayer);
+
+                const lp = offsetLatLng(centerLat, centerLng, dist, backwardAngle - 45);
+                L.marker(lp, {
+                    icon: L.divIcon({
+                        className: '',
+                        html: `<div style="background:rgba(0,0,0,0.7);border-radius:3px;padding:1px 4px;color:#fff;font-size:10px;font-weight:bold;text-align:center;">${dist}m</div>`,
+                        iconSize: [36, 14],
+                        iconAnchor: [18, 7]
+                    })
                 }).addTo(chimneyLayer);
             });
         }
 
-        // ========== 初期化 ==========
-        updateOverlay();
+        // ========== コントロール ==========
+        function updateParams() {
+            document.getElementById('opacityValue').textContent = document.getElementById('opacitySlider').value + '%';
+            document.getElementById('rotationValue').textContent = document.getElementById('rotationSlider').value + '\u00B0';
+            document.getElementById('scaleValue').textContent = document.getElementById('scaleSlider').value + '%';
+            document.getElementById('offsetXValue').textContent = document.getElementById('offsetXSlider').value + 'm';
+            document.getElementById('offsetYValue').textContent = document.getElementById('offsetYSlider').value + 'm';
 
-        // マップ移動/ズーム時にCSS回転を再適用
-        map.on('zoomanim moveend', function() {
-            if (contourOverlay) {
-                const rotation = parseInt(document.getElementById('rotationSlider').value);
-                const fallDirection = rotation + 180;
-                const cssRotation = fallDirection - 90;
-                const imgElement = contourOverlay.getElement();
-                if (imgElement) {
-                    imgElement.style.transformOrigin = 'center center';
-                    imgElement.style.transform = `rotate(${cssRotation}deg)`;
-                }
-            }
-        });
+            contourLayer.redraw();
+            updateChimneyLine();
+        }
+
+        function toggleContour() {
+            contourVisible = !contourVisible;
+            const btn = document.getElementById('contourToggle');
+            btn.classList.toggle('active', contourVisible);
+            btn.textContent = contourVisible ? 'コンター図: 表示中' : 'コンター図: 非表示';
+            contourLayer.redraw();
+        }
+
+        // ========== 初期化 ==========
+        updateChimneyLine();
     </script>
 </body>
 </html>
