@@ -453,9 +453,10 @@
                 <button class="direction-btn" id="lat222DirBtn" onclick="setDirection('lateral_222m')">横_222m<br><small>転倒側222m</small></button>
             </div>
 
-            <!-- dB表示切替 -->
-            <div class="db-toggle">
-                <button class="db-btn" id="dbBtn" onclick="toggleDb()">dB列を非表示</button>
+            <!-- 詳細列表示切替 -->
+            <div class="db-toggle" style="display:flex; gap:6px;">
+                <button class="db-btn" id="galBtn" onclick="toggleGal()">Gal列を表示</button>
+                <button class="db-btn" id="dbBtn" onclick="toggleDb()">dB列を表示</button>
             </div>
 
             <!-- 測定パターン説明 -->
@@ -516,119 +517,26 @@
             </div>
 
             <!-- 解析結果テーブル -->
-            <h2>解析結果一覧（加速度 [m/s²]）</h2>
+            <h2>解析結果一覧</h2>
 
-            <!-- 後方（タービン側）-->
             <div class="data-section" id="backwardSection">
                 <h3>後方（タービン側）</h3>
-                <table id="backwardTable" class="db-hidden">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">RCCM</th>
-                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
-                        </tr>
-                        <tr>
-                            <th class="bos-header">加速度</th>
-                            <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">加速度</th>
-                            <th class="cmrc-header db-column">dB</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>20m</td><td class="bos-cell">1.14</td><td class="bos-cell db-column">121.1</td><td class="cmrc-cell">9.67</td><td class="cmrc-cell db-column">139.7</td><td class="ratio-high">&times;8.5</td></tr>
-                        <tr><td>50m</td><td class="bos-cell">0.85</td><td class="bos-cell db-column">118.6</td><td class="cmrc-cell">12.53</td><td class="cmrc-cell db-column">142.0</td><td class="ratio-high">&times;14.7</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.5</td><td class="cmrc-cell">2.10</td><td class="cmrc-cell db-column">126.4</td><td class="ratio-cell">&times;5.0</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.21</td><td class="bos-cell db-column">106.4</td><td class="cmrc-cell">0.79</td><td class="cmrc-cell db-column">118.0</td><td class="ratio-cell">&times;3.8</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.10</td><td class="bos-cell db-column">100.0</td><td class="cmrc-cell">0.32</td><td class="cmrc-cell db-column">110.1</td><td class="ratio-cell">&times;3.2</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.09</td><td class="bos-cell db-column">99.1</td><td class="cmrc-cell">0.20</td><td class="cmrc-cell db-column">106.0</td><td class="ratio-cell">&times;2.2</td></tr>
-                    </tbody>
-                </table>
+                <div id="backwardTableContainer"></div>
             </div>
 
-            <!-- 横_0m（公共道路側）-->
             <div class="data-section" id="lateral0Section">
                 <h3>横_0m（公共道路側）</h3>
-                <table id="lateral0Table" class="db-hidden">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">RCCM</th>
-                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
-                        </tr>
-                        <tr>
-                            <th class="bos-header">加速度</th>
-                            <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">加速度</th>
-                            <th class="cmrc-header db-column">dB</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>50m</td><td class="bos-cell">1.07</td><td class="bos-cell db-column">120.6</td><td class="cmrc-cell">15.66</td><td class="cmrc-cell db-column">143.9</td><td class="ratio-high">&times;14.6</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">0.73</td><td class="bos-cell db-column">117.3</td><td class="cmrc-cell">2.03</td><td class="cmrc-cell db-column">126.1</td><td class="ratio-cell">&times;2.8</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.36</td><td class="bos-cell db-column">111.1</td><td class="cmrc-cell">1.14</td><td class="cmrc-cell db-column">121.1</td><td class="ratio-cell">&times;3.2</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.16</td><td class="bos-cell db-column">104.1</td><td class="cmrc-cell">0.84</td><td class="cmrc-cell db-column">118.5</td><td class="ratio-cell">&times;5.2</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.15</td><td class="bos-cell db-column">103.5</td><td class="cmrc-cell">0.49</td><td class="cmrc-cell db-column">113.8</td><td class="ratio-cell">&times;3.3</td></tr>
-                    </tbody>
-                </table>
+                <div id="lateral0TableContainer"></div>
             </div>
 
-            <!-- 横_200m（転倒側220m）-->
             <div class="data-section" id="lateral200Section">
                 <h3>横_200m（転倒側220m）(3a)</h3>
-                <table id="lateral200Table" class="db-hidden">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">RCCM</th>
-                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
-                        </tr>
-                        <tr>
-                            <th class="bos-header">加速度</th>
-                            <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">加速度</th>
-                            <th class="cmrc-header db-column">dB</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>50m</td><td class="bos-cell">2.78</td><td class="bos-cell db-column">128.9</td><td class="cmrc-cell">47.51</td><td class="cmrc-cell db-column">153.5</td><td class="ratio-high">&times;17.1</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">1.97</td><td class="bos-cell db-column">125.9</td><td class="cmrc-cell">18.19</td><td class="cmrc-cell db-column">145.2</td><td class="ratio-high">&times;9.2</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.46</td><td class="bos-cell db-column">113.3</td><td class="cmrc-cell">4.03</td><td class="cmrc-cell db-column">132.1</td><td class="ratio-high">&times;8.8</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.42</td><td class="bos-cell db-column">112.5</td><td class="cmrc-cell">2.21</td><td class="cmrc-cell db-column">126.9</td><td class="ratio-cell">&times;5.3</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.09</td><td class="cmrc-cell db-column">126.4</td><td class="ratio-high">&times;6.7</td></tr>
-                    </tbody>
-                </table>
+                <div id="lateral200TableContainer"></div>
             </div>
 
-            <!-- 横_222m（転倒側222m）-->
             <div class="data-section" id="lateral222Section">
                 <h3>横_222m（転倒側222m）(3b)</h3>
-                <table id="lateral222Table" class="db-hidden">
-                    <thead>
-                        <tr>
-                            <th rowspan="2">距離</th>
-                            <th colspan="2" class="bos-header">BOS</th>
-                            <th colspan="2" class="cmrc-header">RCCM</th>
-                            <th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>
-                        </tr>
-                        <tr>
-                            <th class="bos-header">加速度</th>
-                            <th class="bos-header db-column">dB</th>
-                            <th class="cmrc-header">加速度</th>
-                            <th class="cmrc-header db-column">dB</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr><td>50m</td><td class="bos-cell">3.04</td><td class="bos-cell db-column">129.7</td><td class="cmrc-cell">70.57</td><td class="cmrc-cell db-column">157.0</td><td class="ratio-high">&times;23.2</td></tr>
-                        <tr><td>100m</td><td class="bos-cell">1.39</td><td class="bos-cell db-column">122.9</td><td class="cmrc-cell">24.62</td><td class="cmrc-cell db-column">147.8</td><td class="ratio-high">&times;17.7</td></tr>
-                        <tr><td>200m</td><td class="bos-cell">0.52</td><td class="bos-cell db-column">114.3</td><td class="cmrc-cell">5.56</td><td class="cmrc-cell db-column">134.9</td><td class="ratio-high">&times;10.7</td></tr>
-                        <tr><td>300m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.26</td><td class="cmrc-cell db-column">127.1</td><td class="ratio-high">&times;7.3</td></tr>
-                        <tr><td>400m</td><td class="bos-cell">0.31</td><td class="bos-cell db-column">109.8</td><td class="cmrc-cell">2.41</td><td class="cmrc-cell db-column">127.6</td><td class="ratio-high">&times;7.8</td></tr>
-                    </tbody>
-                </table>
+                <div id="lateral222TableContainer"></div>
             </div>
 
             <!-- リンク -->
@@ -643,29 +551,34 @@
 
             <!-- 換算表 -->
             <div class="conversion-table">
-                <h3>加速度・dB・震度 換算表</h3>
+                <h3>加速度・Gal・dB・震度 換算表</h3>
                 <table>
                     <thead>
                         <tr>
                             <th>加速度 [m/s²]</th>
-                            <th>dB</th>
+                            <th>Gal [cm/s²]</th>
+                            <th>dB<br><small>(25Gal=100dB)</small></th>
                             <th>震度（目安）</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td>0.001</td><td>60</td><td>0</td></tr>
-                        <tr><td>0.01</td><td>80</td><td>1</td></tr>
-                        <tr><td>0.1</td><td>100</td><td>2〜3</td></tr>
-                        <tr><td>1</td><td>120</td><td>3〜4</td></tr>
-                        <tr><td>10</td><td>140</td><td>5強〜6弱</td></tr>
+                        <tr><td>0.001</td><td>0.1</td><td>52.0</td><td>0</td></tr>
+                        <tr><td>0.01</td><td>1</td><td>72.0</td><td>1</td></tr>
+                        <tr><td>0.1</td><td>10</td><td>92.0</td><td>2〜3</td></tr>
+                        <tr><td>0.25</td><td>25</td><td>100.0</td><td>3</td></tr>
+                        <tr><td>1</td><td>100</td><td>112.0</td><td>3〜4</td></tr>
+                        <tr><td>10</td><td>1000</td><td>132.0</td><td>5強〜6弱</td></tr>
                     </tbody>
                 </table>
-                <div class="formula">1 m/s² = 120 dB</div>
+                <div class="formula">
+                    1 m/s² = 100 Gal &nbsp;|&nbsp; dB = 100 + 20&times;log₁₀(Gal/25)
+                </div>
             </div>
 
             <div class="note">
                 ※ 倍率が×10以上は赤色で強調表示<br>
-                ※ 横_200m/222mは煙突先端付近（転倒側）の横断面での計測
+                ※ 横_200m/222mは煙突先端付近（転倒側）の横断面での計測<br>
+                ※ dBは振動規制法基準（25Gal = 100dB）で換算
             </div>
         </div>
     </div>
@@ -678,6 +591,12 @@
         let currentCompany = 'both';
         let currentDirection = 'all';
         let showDb = false;
+        let showGal = false;
+
+        // 単位変換関数
+        function accToGal(acc) { return (acc * 100).toFixed(1); }
+        function galToDb(gal) { return (100 + 20 * Math.log10(gal / 25)).toFixed(1); }
+        function accToDb(acc) { return galToDb(acc * 100); }
 
         // BOSデータ（4方向）
         const bosData = {
@@ -876,8 +795,8 @@
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:${colors.bos}">BOS ${point.id} ${dirName} ${point.dist}m</b><br>
-                        加速度: <b>${point.acc} m/s²</b><br>
-                        dB: <b>${(120 + 20*Math.log10(point.acc)).toFixed(1)}</b><br>
+                        加速度: <b>${point.acc} m/s²</b> (${accToGal(point.acc)} Gal)<br>
+                        振動レベル: <b>${accToDb(point.acc)} dB</b><br>
                         倍率(RCCM/BOS): <b>&times;${ratio}</b>
                     `);
                     bosLayer.addLayer(marker);
@@ -900,8 +819,8 @@
                     marker.bindTooltip(point.id, { permanent: true, direction: 'center', className: 'marker-label' });
                     marker.bindPopup(`
                         <b style="color:${colors.rccm}">RCCM ${point.id} ${dirName} ${point.dist}m</b><br>
-                        加速度: <b>${point.acc} m/s²</b><br>
-                        dB: <b>${(120 + 20*Math.log10(point.acc)).toFixed(1)}</b><br>
+                        加速度: <b>${point.acc} m/s²</b> (${accToGal(point.acc)} Gal)<br>
+                        振動レベル: <b>${accToDb(point.acc)} dB</b><br>
                         倍率(RCCM/BOS): <b>&times;${ratio}</b>
                     `);
                     rccmLayer.addLayer(marker);
@@ -1072,19 +991,85 @@
             createMarkers();
         }
 
+        // ========== テーブル動的生成 ==========
+        const tableDirMap = {
+            backward: { container: 'backwardTableContainer' },
+            lateral_0m: { container: 'lateral0TableContainer' },
+            lateral_200m: { container: 'lateral200TableContainer' },
+            lateral_222m: { container: 'lateral222TableContainer' }
+        };
+
+        function renderTables() {
+            Object.keys(tableDirMap).forEach(dir => {
+                const container = document.getElementById(tableDirMap[dir].container);
+                const bos = bosData[dir];
+                const rccm = rccmData[dir];
+                const ratios = ratioData[dir];
+
+                // ヘッダー構築
+                let bosColspan = 1;
+                let rccmColspan = 1;
+                if (showGal) { bosColspan++; rccmColspan++; }
+                if (showDb) { bosColspan++; rccmColspan++; }
+
+                let headerRow1 = `<th rowspan="2">距離</th>`;
+                headerRow1 += `<th colspan="${bosColspan}" class="bos-header">BOS</th>`;
+                headerRow1 += `<th colspan="${rccmColspan}" class="cmrc-header">RCCM</th>`;
+                headerRow1 += `<th rowspan="2" class="ratio-header">倍率<br>RCCM/BOS</th>`;
+
+                let headerRow2 = '';
+                headerRow2 += `<th class="bos-header">m/s²</th>`;
+                if (showGal) headerRow2 += `<th class="bos-header">Gal</th>`;
+                if (showDb) headerRow2 += `<th class="bos-header">dB</th>`;
+                headerRow2 += `<th class="cmrc-header">m/s²</th>`;
+                if (showGal) headerRow2 += `<th class="cmrc-header">Gal</th>`;
+                if (showDb) headerRow2 += `<th class="cmrc-header">dB</th>`;
+
+                // データ行構築
+                let rows = '';
+                bos.forEach((bp, idx) => {
+                    const rp = rccm[idx];
+                    const ratio = ratios[idx];
+                    const ratioClass = ratio >= 10 ? 'ratio-high' : 'ratio-cell';
+
+                    rows += `<tr>`;
+                    rows += `<td>${bp.dist}m</td>`;
+                    rows += `<td class="bos-cell">${bp.acc}</td>`;
+                    if (showGal) rows += `<td class="bos-cell">${accToGal(bp.acc)}</td>`;
+                    if (showDb) rows += `<td class="bos-cell">${accToDb(bp.acc)}</td>`;
+                    rows += `<td class="cmrc-cell">${rp.acc}</td>`;
+                    if (showGal) rows += `<td class="cmrc-cell">${accToGal(rp.acc)}</td>`;
+                    if (showDb) rows += `<td class="cmrc-cell">${accToDb(rp.acc)}</td>`;
+                    rows += `<td class="${ratioClass}">&times;${ratio}</td>`;
+                    rows += `</tr>`;
+                });
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>${headerRow1}</tr>
+                            <tr>${headerRow2}</tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                `;
+            });
+        }
+
+        // ========== Gal表示切替 ==========
+        function toggleGal() {
+            showGal = !showGal;
+            document.getElementById('galBtn').classList.toggle('active', showGal);
+            document.getElementById('galBtn').textContent = showGal ? 'Gal列を表示中' : 'Gal列を表示';
+            renderTables();
+        }
+
         // ========== dB表示切替 ==========
         function toggleDb() {
             showDb = !showDb;
             document.getElementById('dbBtn').classList.toggle('active', showDb);
-            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示中' : 'dB列を非表示';
-
-            const tables = ['backwardTable', 'lateral0Table', 'lateral200Table', 'lateral222Table'];
-            tables.forEach(tableId => {
-                const table = document.getElementById(tableId);
-                if (table) {
-                    table.classList.toggle('db-hidden', !showDb);
-                }
-            });
+            document.getElementById('dbBtn').textContent = showDb ? 'dB列を表示中' : 'dB列を表示';
+            renderTables();
         }
 
         // ========== 回転スライダー ==========
@@ -1101,6 +1086,7 @@
         createMarkers();
         updateCircles();
         updateLines();
+        renderTables();
 
         // マーカーラベル用スタイル
         const style = document.createElement('style');
