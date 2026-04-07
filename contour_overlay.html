@@ -232,11 +232,12 @@
         const centerLng = 140.698911;
 
         // コンター画像の解析値
-        // 煙突(230m)が画像内で260pxに相当 → 0.885 m/px
-        const IMAGE_M_PER_PX = 0.885;
-        // 煙突基部の画像内位置（左上原点、0-1の比率）
-        const ANCHOR_RATIO_X = 0.177;
-        const ANCHOR_RATIO_Y = 0.562;
+        // 煙突(230m)が画像内で233pxに相当 → 0.988 m/px
+        const IMAGE_M_PER_PX = 0.988;
+        // 煙突基部（ピボット）の画像内位置（左上原点、0-1の比率）
+        // 緑色支持構造の収束点から算出: (102.2px, 242.9px) / (423, 320)
+        const ANCHOR_RATIO_X = 0.242;
+        const ANCHOR_RATIO_Y = 0.759;
 
         // ========== マップ初期化 ==========
         const map = L.map('map', {
