@@ -254,11 +254,12 @@
             },
             bos: {
                 // BOS: Chimney Analysis (700m×500m プロット、煙突基部=左から400m/上から400m)
+                // 単位は [mm/s²] (BOS回答スライドより)。転倒右側は計算領域省略（対称仮定）
                 file: 'contour_bos.png',
                 IMAGE_M_PER_PX: 0.6910,
                 ANCHOR_RATIO_X: 0.5716,
                 ANCHOR_RATIO_Y: 0.8002,
-                legendTitle: 'Resultant Acceleration [m/s²]',
+                legendTitle: 'Resultant Acceleration [mm/s²]',
                 legendLabels: ['0','2e+2','4e+2','6e+2','8e+2','1e+3']
             }
         };
@@ -492,14 +493,26 @@
         }
 
         function setSource(src) {
-            if (!(src in SOURCES) || src === currentSource) return;
+            console.log('[setSource] requested=', src, 'current=', currentSource);
+            if (!(src in SOURCES)) return;
             currentSource = src;
             cfg = SOURCES[src];
             document.getElementById('srcRccmBtn').classList.toggle('active', src === 'rccm');
             document.getElementById('srcBosBtn').classList.toggle('active', src === 'bos');
             updateLegend();
+            // コンター表示が消されていたら自動的にONに戻す
+            if (!contourVisible) {
+                contourVisible = true;
+                const btn = document.getElementById('contourToggle');
+                btn.classList.add('active');
+                btn.textContent = 'コンター図: 表示中';
+            }
             // 画像差し替え：onload で redraw
-            contourImage.onload = () => contourLayer.redraw();
+            contourImage.onload = () => {
+                console.log('[setSource] image loaded', cfg.file, contourImage.naturalWidth, 'x', contourImage.naturalHeight);
+                contourLayer.redraw();
+            };
+            contourImage.onerror = (e) => console.error('[setSource] image load FAILED', cfg.file, e);
             contourImage.src = cfg.file + '?v=' + Date.now();
         }
 
