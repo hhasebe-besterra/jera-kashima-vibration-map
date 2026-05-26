@@ -375,12 +375,14 @@
                 const anchorPx = this._map.latLngToContainerPoint(anchorLatLng);
 
                 // 現在のズームでの1メートルあたりのピクセル数を計算
+                // (Leaflet 1.9.4 が latLngToContainerPoint で整数丸めするため
+                //  1m差では deltaX=0 になる罠あり。1000m差で計測して 1/1000 する)
                 const lat = anchorLatLng[0];
                 const lng = anchorLatLng[1];
                 const p1 = this._map.latLngToContainerPoint([lat, lng]);
-                const oneMeterLng = 1 / (111320 * Math.cos(lat * Math.PI / 180));
-                const p2 = this._map.latLngToContainerPoint([lat, lng + oneMeterLng]);
-                const pixelsPerMeter = Math.abs(p2.x - p1.x);
+                const kmLng = 1000 / (111320 * Math.cos(lat * Math.PI / 180));
+                const p2 = this._map.latLngToContainerPoint([lat, lng + kmLng]);
+                const pixelsPerMeter = Math.abs(p2.x - p1.x) / 1000;
 
                 // 画像の描画スケール
                 // IMAGE_M_PER_PX → 1px in image = X m in real
