@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JERA鹿島 RCCM コンター図オーバーレイ</title>
+    <title>JERA鹿島 コンター図オーバーレイ (RCCM / BOS)</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
@@ -154,8 +154,16 @@
     <div id="map"></div>
 
     <div class="control-panel">
-        <h2>RCCM コンター図オーバーレイ</h2>
+        <h2>コンター図オーバーレイ</h2>
         <p style="font-size:11px; color:#aaa; margin-bottom:12px;">Resultant Acceleration 分布をマップに重畳表示</p>
+
+        <div class="control-group">
+            <label>解析ソース</label>
+            <div style="display:flex; gap:6px;">
+                <button class="toggle-btn active" id="srcRccmBtn" style="flex:1;" onclick="setSource('rccm')">RCCM</button>
+                <button class="toggle-btn" id="srcBosBtn" style="flex:1;" onclick="setSource('bos')">BOS</button>
+            </div>
+        </div>
 
         <div class="control-group">
             <button class="toggle-btn active" id="contourToggle" onclick="toggleContour()">
@@ -205,9 +213,9 @@
         </div>
 
         <div class="color-legend">
-            <h4>Resultant Acceleration [m/s²]</h4>
+            <h4 id="legendTitle">Resultant Acceleration [m/s²]</h4>
             <div class="color-bar"></div>
-            <div class="color-labels">
+            <div class="color-labels" id="legendLabels">
                 <span>0</span>
                 <span>2e+3</span>
                 <span>4e+3</span>
@@ -231,13 +239,32 @@
         const centerLat = 35.917924;
         const centerLng = 140.698911;
 
-        // コンター画像の解析値
-        // 煙突(230m)が画像内で233pxに相当 → 0.988 m/px
-        const IMAGE_M_PER_PX = 0.988;
-        // 煙突基部（ピボット）の画像内位置（左上原点、0-1の比率）
-        // 緑色支持構造の収束点から算出: (102.2px, 242.9px) / (423, 320)
-        const ANCHOR_RATIO_X = 0.242;
-        const ANCHOR_RATIO_Y = 0.759;
+        // 解析ソース毎のコンター設定
+        // - IMAGE_M_PER_PX: 画像1px が現実の何mに相当するか
+        // - ANCHOR_RATIO_X/Y: 煙突基部の画像内正規化位置 (0-1)
+        // - LEGEND_MAX: 凡例の最大値 (右端ラベル)
+        const SOURCES = {
+            rccm: {
+                file: 'contour_rev002.png',
+                IMAGE_M_PER_PX: 0.988,
+                ANCHOR_RATIO_X: 0.242,
+                ANCHOR_RATIO_Y: 0.759,
+                legendTitle: 'Resultant Acceleration [m/s²]',
+                legendLabels: ['0','2e+3','4e+3','6e+3','8e+3','1e+4']
+            },
+            bos: {
+                // BOS: Chimney Analysis (700m×500m プロット、煙突基部=左から400m/上から400m)
+                file: 'contour_bos.png',
+                IMAGE_M_PER_PX: 0.6910,
+                ANCHOR_RATIO_X: 0.5716,
+                ANCHOR_RATIO_Y: 0.8002,
+                legendTitle: 'Resultant Acceleration [m/s²]',
+                legendLabels: ['0','2e+2','4e+2','6e+2','8e+2','1e+3']
+            }
+        };
+
+        let currentSource = 'rccm';
+        let cfg = SOURCES[currentSource];
 
         // ========== マップ初期化 ==========
         const map = L.map('map', {
@@ -284,7 +311,7 @@
 
         // ========== Canvas コンターオーバーレイ ==========
         const contourImage = new Image();
-        contourImage.src = 'contour_rev002.png';
+        contourImage.src = cfg.file;
 
         let contourVisible = true;
         let canvas, ctx;
@@ -355,9 +382,9 @@
                 const pixelsPerMeter = Math.abs(p2.x - p1.x);
 
                 // 画像の描画スケール
-                // IMAGE_M_PER_PX = 0.885 m/px → 1px in image = 0.885m in real
+                // IMAGE_M_PER_PX → 1px in image = X m in real
                 // We need: drawScale = pixelsPerMeter * IMAGE_M_PER_PX * userScale
-                const drawScale = pixelsPerMeter * IMAGE_M_PER_PX * scale;
+                const drawScale = pixelsPerMeter * cfg.IMAGE_M_PER_PX * scale;
 
                 const imgW = contourImage.width * drawScale;
                 const imgH = contourImage.height * drawScale;
@@ -376,8 +403,8 @@
                 ctx.rotate(canvasAngle);
                 // アンカー位置（煙突基部）が画像内のANCHOR_RATIO位置に来るように描画
                 ctx.drawImage(contourImage,
-                    -ANCHOR_RATIO_X * imgW,
-                    -ANCHOR_RATIO_Y * imgH,
+                    -cfg.ANCHOR_RATIO_X * imgW,
+                    -cfg.ANCHOR_RATIO_Y * imgH,
                     imgW, imgH);
                 ctx.restore();
             },
@@ -458,7 +485,26 @@
             contourLayer.redraw();
         }
 
+        function updateLegend() {
+            document.getElementById('legendTitle').textContent = cfg.legendTitle;
+            const labels = document.getElementById('legendLabels');
+            labels.innerHTML = cfg.legendLabels.map(l => `<span>${l}</span>`).join('');
+        }
+
+        function setSource(src) {
+            if (!(src in SOURCES) || src === currentSource) return;
+            currentSource = src;
+            cfg = SOURCES[src];
+            document.getElementById('srcRccmBtn').classList.toggle('active', src === 'rccm');
+            document.getElementById('srcBosBtn').classList.toggle('active', src === 'bos');
+            updateLegend();
+            // 画像差し替え：onload で redraw
+            contourImage.onload = () => contourLayer.redraw();
+            contourImage.src = cfg.file + '?v=' + Date.now();
+        }
+
         // ========== 初期化 ==========
+        updateLegend();
         updateChimneyLine();
     </script>
 </body>
